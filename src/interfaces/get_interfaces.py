@@ -14,7 +14,7 @@ def get_interfaces(target_node):
         interfaces.append(Interface(
             interface_info['name'],
             interface_info['interfaceAddress']['ipAddr']['address'],
-            interface_info['interfaceAddress']['ipAddr']['masklen'],
+            interface_info['interfaceAddress']['ipAddr']['maskLen'],
             interface_info.get('lineProtocolStatus', 'unknown'),
             interface_info.get('interfaceStatus', 'unknown')
         ))
