@@ -3,6 +3,7 @@ class Network:
         self.area = area
         self.nodes = set()
         self.links = set()
+        self.ospfInterAreaRoutes = set()
 
     def add_node(self, node):
         self.nodes.add(node)
@@ -10,8 +11,11 @@ class Network:
     def add_link(self, link):
         self.links.add(link)
 
+    def add_inter_area_route(self, route):
+        self.ospfInterAreaRoutes.add(route)
+
     def __str__(self):
-        topology_str = f"topology area {self.area}:\n  nodes:"  # Usa f-string
+        topology_str = f"topology area {self.area}:\n  nodes:"
 
         for node in self.nodes:
             topology_str += f"\n    - {node}"
@@ -27,7 +31,16 @@ class Network:
             topology_str += f"\n      - bdr: {getattr(link, 'bdr', None)}"
             topology_str += f"\n      - metric: {link.metric}"
 
+        topology_str += "\n  ospf inter-area routes:"
+        
+        for route in self.ospfInterAreaRoutes:
+            topology_str += f"\n    - ip: {route.ip}"
+            topology_str += f"\n      - mask: {route.mask}"
+            topology_str += f"\n      - via: {route.via}"
+            topology_str += f"\n      - metric: {route.metric}"
+
         return topology_str
+
 
 class Node:
     def __init__(self, router_id, interface_list=None):
@@ -92,3 +105,11 @@ class Link:
     def set_dr_bdr(self, dr, bdr):
         self.dr = dr
         self.bdr = bdr
+
+
+class Route:
+    def __init__(self, ip, mask, via, metric):
+        self.ip = ip
+        self.mask = mask
+        self.via = via
+        self.metric = metric

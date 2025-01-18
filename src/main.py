@@ -5,6 +5,7 @@ from interfaces.get_interfaces import *
 from neighbors.get_neighbors import *
 from lsa_1.router_lsa import *
 from lsa_2.network_lsa import *
+from lsa_3.summary_lsa import *
 from protocol.protocol_info import *
 from utilities import *
 
@@ -71,9 +72,7 @@ for area_data in router_lsa_1:
 
 network_lsa_2 = get_network_lsa_info(target_node)
 for area_data in network_lsa_2:
-    area_id = area_data
-
-    for area_id, area_network in main_networks.items():
+    for area_data, area_network in main_networks.items():
         for area_db_entry in network_lsa_2[area_data]['areaDatabase']:
             for lsa_entry in area_db_entry['areaLsas']:
                 link_state_id = lsa_entry['linkStateId']
@@ -87,8 +86,26 @@ for area_data in network_lsa_2:
                         link.set_mask(network_mask)
                         link.set_dr_bdr(dr, bdr)
 
+# recupero LSA tipo 3
+
+summary_lsa_3 = get_summary_lsa_info(target_node)
+for area_data in summary_lsa_3:
+    target_network = main_networks[area_data]
+
+    if not target_network:
+        continue
+    
+    for area_db_entry in summary_lsa_3[area_data]['areaDatabase']:
+        for lsa_entry in area_db_entry['areaLsas']:
+                ip = lsa_entry['linkStateId']
+                mask = lsa_entry['ospfSummaryLsa']['networkMask']
+                via = lsa_entry['advertisingRouter']
+                metric = lsa_entry['ospfSummaryLsa']['metric']
+
+                route = Route(ip, mask, via, metric)
+
+                target_network.add_inter_area_route(route)
+
 
 for area_id, area_network in main_networks.items():
     print(f"\n{area_network}")
-
-
