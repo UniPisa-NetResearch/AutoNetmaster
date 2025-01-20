@@ -1,9 +1,45 @@
 class Network:
-    def __init__(self, area):
-        self.area = area
+    def __init__(self):
+        self.areas = set()
+        self.external_routes = set()
+
+    def add_area(self, area):
+        self.areas.add(area)
+
+    def add_external_network(self, route):
+        self.external_routes.add(route)
+
+    def find_target_area(self, area_data):
+        target_area = None
+        for area in self.areas:
+            if area.area_id == area_data:
+                target_area = area
+                break
+        return target_area
+
+    def __str__(self):
+        topology_str = "\nNETWORK TOPOLOGY:\n"
+
+        for area in self.areas:
+            topology_str += f"\n{str(area)}"
+        
+        topology_str += "\n\nexternal routes:"
+        for route in self.external_routes:
+            topology_str += f"\n  - ip: {route.ip}"
+            topology_str += f"\n    - mask: {route.mask}"
+            topology_str += f"\n    - via: {route.via}"
+            topology_str += f"\n    - metric: {route.metric}"
+            topology_str += f"\n    - metric_type: {route.metric_type}"
+
+        return topology_str
+
+class Area:
+    def __init__(self, area_id):
+        self.area_id = area_id
         self.nodes = set()
         self.links = set()
-        self.ospfInterAreaRoutes = set()
+        self.ospf_inter_area_routes = set()
+        self.paths_to_asbrs = set()
 
     def add_node(self, node):
         self.nodes.add(node)
@@ -12,10 +48,13 @@ class Network:
         self.links.add(link)
 
     def add_inter_area_route(self, route):
-        self.ospfInterAreaRoutes.add(route)
+        self.ospf_inter_area_routes.add(route)
+
+    def add_path_to_asbr(self, path):
+        self.paths_to_asbrs.add(path)
 
     def __str__(self):
-        topology_str = f"topology area {self.area}:\n  nodes:"
+        topology_str = f"area {self.area_id}:\n  nodes:"
 
         for node in self.nodes:
             topology_str += f"\n    - {node}"
@@ -33,11 +72,18 @@ class Network:
 
         topology_str += "\n  ospf inter-area routes:"
         
-        for route in self.ospfInterAreaRoutes:
+        for route in self.ospf_inter_area_routes:
             topology_str += f"\n    - ip: {route.ip}"
             topology_str += f"\n      - mask: {route.mask}"
             topology_str += f"\n      - via: {route.via}"
             topology_str += f"\n      - metric: {route.metric}"
+
+        topology_str += "\n  paths to ASBRs:"
+        
+        for path in self.paths_to_asbrs:
+            topology_str += f"\n    - ASBR: {path.asbr}"
+            topology_str += f"\n      - via: {path.via}"
+            topology_str += f"\n      - metric: {path.metric}"
 
         return topology_str
 
@@ -108,8 +154,15 @@ class Link:
 
 
 class Route:
-    def __init__(self, ip, mask, via, metric):
+    def __init__(self, ip, mask, via, metric, metric_type=None):
         self.ip = ip
         self.mask = mask
+        self.via = via
+        self.metric = metric
+        self.metric_type = metric_type
+
+class Path_To_ASBR:
+    def __init__(self, asbr, via, metric):
+        self.asbr = asbr
         self.via = via
         self.metric = metric
