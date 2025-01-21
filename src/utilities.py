@@ -85,21 +85,29 @@ class Area:
             topology_str += f"\n      - via: {path.via}"
             topology_str += f"\n      - metric: {path.metric}"
 
+        topology_str += "\n"
+
         return topology_str
 
 
 class Node:
-    def __init__(self, router_id, interface_list=None):
+    def __init__(self, router_id, interface_list=None, neighbor_list=None):
         self.router_id = router_id
         self.interfaces = interface_list if interface_list else []
-        self.neighbors = []
+        self.neighbors = neighbor_list if neighbor_list else []
 
-    def add_interface(self, interface):
-        self.interfaces.append(interface)
+    def add_interface(self, id, ip, masklen, ok, status):
+        self.interfaces.append({
+            "id": id,
+            "ip": ip,
+            "masklen": masklen,
+            "ok": ok,
+            "status": status
+        })
 
-    def add_neighbor(self, interface, neighbor_router_id, adjacency_state, designated_router, backup_designated_router):
+    def add_neighbor(self, interface_id, neighbor_router_id, adjacency_state, designated_router, backup_designated_router):
         self.neighbors.append({
-            "interface": interface,
+            "interface_id": interface_id,
             "router_id": neighbor_router_id,
             "adjacency_state": adjacency_state,
             "designated_router": designated_router,
@@ -107,30 +115,22 @@ class Node:
         })
 
     def __str__(self):
-        interface_str = "\n        ".join(str(iface) for iface in self.interfaces)
+        interface_str = "\n        ".join(
+            f"ID: {iface['name']}, IP: {iface['ip']}/{iface['masklen']}, OK: {iface['ok']}, Status: {iface['status']}"
+            for iface in self.interfaces
+        )
         neighbors_str = "\n        ".join(
-            f"Interface: {n['interface']}, Router ID: {n['router_id']}, "
+            f"Interface ID: {n['interface']}, Router ID: {n['router_id']}, "
             f"Adjacency State: {n['adjacency_state']}, Designated Router: {n['designated_router']}, "
             f"Backup Designated Router: {n['backup_designated_router']}" for n in self.neighbors
         )
         return (
             f"Router ID: {self.router_id}\n"
-            f"    Interfaces:\n        {interface_str}\n"
+            f"    Interfaces:\n        {interface_str if self.interfaces else 'None'}\n"
             f"    Neighbors:\n        {neighbors_str if self.neighbors else 'None'}"
         )
-
-
-class Interface:
-    def __init__(self, id, ip, masklen, ok, status):
-        self.id = id
-        self.ip = ip
-        self.masklen = masklen
-        self.ok = ok
-        self.status = status
-
-    def __str__(self):
-        return f"ID: {self.id}, IP: {self.ip}/{self.masklen}, OK: {self.ok}, Status: {self.status}"
     
+
 class Link:
     def __init__(self, id, type, options, metric, mask=None, endpoints=None, dr=None, bdr=None):
         self.id = id
@@ -160,6 +160,7 @@ class Route:
         self.via = via
         self.metric = metric
         self.metric_type = metric_type
+
 
 class Path_To_ASBR:
     def __init__(self, asbr, via, metric):

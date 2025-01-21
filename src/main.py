@@ -1,6 +1,7 @@
 import pyeapi
 import sys
 
+from protocol.protocol_info import *
 from interfaces.get_interfaces import *
 from neighbors.get_neighbors import *
 from lsa_1.router_lsa import *
@@ -8,7 +9,6 @@ from lsa_2.network_lsa import *
 from lsa_3.summary_lsa import *
 from lsa_4.asbr_summary_lsa import *
 from lsa_5.external_lsa import *
-from protocol.protocol_info import *
 from utilities import *
 
 if len(sys.argv) < 2:
@@ -22,17 +22,13 @@ print('**** OSPF Management APP ****\n')
 target_node = pyeapi.connect_to(input_node)
 
 interfaces = get_interfaces(target_node)
+
 protocol_info = get_protocol_info(target_node)
+
 neighbors = get_neighbors(target_node)
 
-router = Node(protocol_info['Router ID'], interfaces)
-for neighbor in neighbors:
-    interface = neighbor['interface']
-    router_id = neighbor['router_id']
-    adjacency_state = neighbor['adjacency_state']
-    designated_router = neighbor['designated_router']
-    backup_designated_router = neighbor['backup_designated_router']
-    router.add_neighbor(interface, router_id, adjacency_state, designated_router, backup_designated_router)
+router = Node(protocol_info['Router ID'], interfaces, neighbors)
+
 print(f"\n{router}\n")
 
 network_topology = Network()
@@ -72,6 +68,7 @@ for area_data in router_lsa_1:
 # recupero LSA tipo 2
 
 network_lsa_2 = get_network_lsa_info(target_node)
+
 for area_data in network_lsa_2:
     for target_area in network_topology.areas:
         for area_db_entry in network_lsa_2[area_data]['areaDatabase']:
@@ -90,6 +87,7 @@ for area_data in network_lsa_2:
 # recupero LSA tipo 3
 
 summary_lsa_3 = get_summary_lsa_info(target_node)
+
 for area_data in summary_lsa_3:
     target_area = network_topology.find_target_area(area_data)
 
@@ -110,6 +108,7 @@ for area_data in summary_lsa_3:
 # recupero LSA tipo 4
 
 asbr_summary_lsa_4 = get_asbr_summary_lsa_info(target_node)
+
 for area_data in asbr_summary_lsa_4:
     target_area = network_topology.find_target_area(area_data)
 
