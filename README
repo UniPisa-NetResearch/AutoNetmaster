@@ -1,3 +1,8 @@
 OSPF management software application
 
 The purpose of the application is to reconstruct the topology of a given network using information, particularly the OSPF database, stored in a specific router within the network.
+
+IMPORTANT: for the test you to create the bridge
+> sudo ip link add SW type bridge
+> sudo ip link set SW up
+> ip link show SW
