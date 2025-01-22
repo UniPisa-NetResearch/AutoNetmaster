@@ -21,13 +21,15 @@ print('**** OSPF Management APP ****\n')
 
 target_node = pyeapi.connect_to(input_node)
 
+hostname = (target_node.enable('show hostname'))[0]['result']['hostname']
+
 interfaces = get_interfaces(target_node)
 
 protocol_info = get_protocol_info(target_node)
 
 neighbors = get_neighbors(target_node)
 
-router = Node(protocol_info['Router ID'], interfaces, neighbors)
+router = Node(protocol_info['Router ID'], hostname, interfaces, neighbors)
 
 print(f"\n{router}\n")
 

@@ -2,7 +2,28 @@ OSPF management software application
 
 The purpose of the application is to reconstruct the topology of a given network using information, particularly the OSPF database, stored in a specific router within the network.
 
-IMPORTANT: for the test you to create the bridge
+
+IMPORTANT: for the test you have to create the bridge and .eapi.conf file in your home directory
+
+bridge manual creation:
 > sudo ip link add SW type bridge
 > sudo ip link set SW up
 > ip link show SW
+
+.eapi.conf:
+[connection:clab-test-A]
+host: 172.20.20.*
+[connection:clab-test-ASBR]
+host: 172.20.20.*
+[connection:clab-test-B]
+host: 172.20.20.*
+[connection:clab-test-C]
+host: 172.20.20.*
+[connection:clab-test-ISP]
+host: 172.20.20.*
+[DEFAULT]
+transport: https
+username: admin
+password: admin
+*Use the management interface IP address provided in the output of 'sudo containerlab deploy'
+

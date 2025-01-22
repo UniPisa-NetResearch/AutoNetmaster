@@ -91,18 +91,19 @@ class Area:
 
 
 class Node:
-    def __init__(self, router_id, interface_list=None, neighbor_list=None):
+    def __init__(self, router_id, hostname, interface_list=None, neighbor_list=None):
+        self.hostname = hostname
         self.router_id = router_id
         self.interfaces = interface_list if interface_list else []
         self.neighbors = neighbor_list if neighbor_list else []
 
-    def add_interface(self, id, ip, masklen, ok, status):
+    def add_interface(self, id, ip, masklen, interface_status, line_protocol_status):
         self.interfaces.append({
             "id": id,
             "ip": ip,
             "masklen": masklen,
-            "ok": ok,
-            "status": status
+            "interface_status": interface_status,
+            "line_protocol_status": line_protocol_status
         })
 
     def add_neighbor(self, interface_id, neighbor_router_id, adjacency_state, designated_router, backup_designated_router):
@@ -116,7 +117,7 @@ class Node:
 
     def __str__(self):
         interface_str = "\n        ".join(
-            f"ID: {iface['name']}, IP: {iface['ip']}/{iface['masklen']}, OK: {iface['ok']}, Status: {iface['status']}"
+            f"ID: {iface['name']}, IP: {iface['ip']}/{iface['masklen']}, Interface Status: {iface['interface_status']}, Line Protocol Status: {iface['line_protocol_status']}"
             for iface in self.interfaces
         )
         neighbors_str = "\n        ".join(
@@ -125,6 +126,7 @@ class Node:
             f"Backup Designated Router: {n['backup_designated_router']}" for n in self.neighbors
         )
         return (
+            f"Hostname: {self.hostname}\n"
             f"Router ID: {self.router_id}\n"
             f"    Interfaces:\n        {interface_str if self.interfaces else 'None'}\n"
             f"    Neighbors:\n        {neighbors_str if self.neighbors else 'None'}"
