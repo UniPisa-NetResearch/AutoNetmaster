@@ -4,6 +4,7 @@ import sys
 from protocol.protocol_info import *
 from interfaces.get_interfaces import *
 from neighbors.get_neighbors import *
+from route_table.get_route_table import *
 from lsa_1.router_lsa import *
 from lsa_2.network_lsa import *
 from lsa_3.summary_lsa import *
@@ -25,11 +26,13 @@ hostname = (target_node.enable('show hostname'))[0]['result']['hostname']
 
 interfaces = get_interfaces(target_node)
 
+route_table = get_route_table(target_node)
+
 protocol_info = get_protocol_info(target_node)
 
 neighbors = get_neighbors(target_node)
 
-router = Node(protocol_info['Router ID'], hostname, interfaces, neighbors)
+router = Node(protocol_info['Router ID'], hostname, interfaces, neighbors, route_table)
 
 print(f"\n{router}\n")
 

@@ -91,11 +91,12 @@ class Area:
 
 
 class Node:
-    def __init__(self, router_id, hostname, interface_list=None, neighbor_list=None):
+    def __init__(self, router_id, hostname, interface_list=None, neighbor_list=None, route_table=None):
         self.hostname = hostname
         self.router_id = router_id
         self.interfaces = interface_list if interface_list else []
         self.neighbors = neighbor_list if neighbor_list else []
+        self.route_table = route_table if route_table else []
 
     def add_interface(self, id, ip, masklen, interface_status, line_protocol_status):
         self.interfaces.append({
@@ -115,6 +116,15 @@ class Node:
             "backup_designated_router": backup_designated_router
         })
 
+    def add_route(self, ip, masklen, via, interface, protocol):
+        self.route_table.append({
+            "ip": ip,
+            "masklen": masklen,
+            "via": via,
+            "interface": interface,
+            "protocol": protocol
+        })
+
     def __str__(self):
         interface_str = "\n        ".join(
             f"ID: {iface['name']}, IP: {iface['ip']}/{iface['masklen']}, Interface Status: {iface['interface_status']}, Line Protocol Status: {iface['line_protocol_status']}"
@@ -125,13 +135,19 @@ class Node:
             f"Adjacency State: {n['adjacency_state']}, Designated Router: {n['designated_router']}, "
             f"Backup Designated Router: {n['backup_designated_router']}" for n in self.neighbors
         )
+        route_table_str = "\n        ".join(
+            f"Destination: {route['ip']}/{route['masklen']}, Via: {route['via']}, "
+            f"Interface: {route['interface']}, Protocol: {route['protocol']}"
+            for route in self.route_table
+        )
         return (
             f"Hostname: {self.hostname}\n"
             f"Router ID: {self.router_id}\n"
             f"    Interfaces:\n        {interface_str if self.interfaces else 'None'}\n"
-            f"    Neighbors:\n        {neighbors_str if self.neighbors else 'None'}"
+            f"    Neighbors:\n        {neighbors_str if self.neighbors else 'None'}\n"
+            f"    Route Table:\n        {route_table_str if self.route_table else 'None'}"
         )
-    
+
 
 class Link:
     def __init__(self, id, type, options, metric, mask=None, endpoints=None, dr=None, bdr=None):
