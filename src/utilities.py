@@ -1,3 +1,5 @@
+import json
+
 class Network:
     def __init__(self):
         self.areas = set()
@@ -32,6 +34,12 @@ class Network:
             topology_str += f"\n    - metric_type: {route.metric_type}"
 
         return topology_str
+    
+    def toJSON(self):
+        return json.dumps({
+            "areas": [area.toJSON() for area in self.areas],
+            "external_routes": [route.toJSON() for route in self.external_routes]
+        }, indent=4)
 
 class Area:
     def __init__(self, area_id):
@@ -88,7 +96,15 @@ class Area:
         topology_str += "\n"
 
         return topology_str
-
+    
+    def toJSON(self):
+        return {
+            "area_id": self.area_id,
+            "nodes": list(self.nodes), 
+            "links": [link.toJSON() for link in self.links],
+            "ospf_inter_area_routes": [route.toJSON() for route in self.ospf_inter_area_routes],
+            "paths_to_asbrs": [path.toJSON() for path in self.paths_to_asbrs]
+        }
 
 class Node:
     def __init__(self, router_id, hostname, interface_list=None, neighbor_list=None, route_table=None):
@@ -147,6 +163,15 @@ class Node:
             f"    Neighbors:\n        {neighbors_str if self.neighbors else 'None'}\n"
             f"    Route Table:\n        {route_table_str if self.route_table else 'None'}"
         )
+    
+    def toJSON(self):
+        return {
+            "hostname": self.hostname,
+            "router_id": self.router_id,
+            "interfaces": self.interfaces,
+            "neighbors": self.neighbors,
+            "route_table": self.route_table
+        }
 
 
 class Link:
@@ -170,6 +195,17 @@ class Link:
         self.dr = dr
         self.bdr = bdr
 
+    def toJSON(self):
+        return {
+            "id": self.id,
+            "type": self.type,
+            "options": self.options,
+            "metric": self.metric,
+            "mask": self.mask,
+            "endpoints": self.endpoints,
+            "dr": self.dr,
+            "bdr": self.bdr
+        }
 
 class Route:
     def __init__(self, ip, mask, via, metric, metric_type=None):
@@ -179,9 +215,25 @@ class Route:
         self.metric = metric
         self.metric_type = metric_type
 
+    def toJSON(self):
+        return {
+            "ip": self.ip,
+            "mask": self.mask,
+            "via": self.via,
+            "metric": self.metric,
+            "metric_type": self.metric_type
+        }
+
 
 class Path_To_ASBR:
     def __init__(self, asbr, via, metric):
         self.asbr = asbr
         self.via = via
         self.metric = metric
+        
+    def toJSON(self):
+        return {
+            "asbr": self.asbr,
+            "via": self.via,
+            "metric": self.metric
+        }

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Topology</title>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/vis-network.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/vis-network.min.css') }}">
+</head>
+<body>
+    <h1>Network Topology</h1>
+    <div id="network" style="width: 100%; height: 500px;"></div>
+
+    <script type="text/javascript">
+        var networkData = JSON.parse({{ data|safe }});
+        
+        var nodes = new vis.DataSet(networkData.map(item => ({
+            id: item.id,
+            label: item.label,
+        })));
+
+        var edges = new vis.DataSet(networkData.map(item => ({
+            from: item.from,
+            to: item.to
+        })));
+
+        var container = document.getElementById('network');
+        var data = {
+            nodes: nodes,
+            edges: edges
+        };
+        var options = {
+            physics: {
+                enabled: true
+            },
+            layout: {
+                improvedLayout: true
+            }
+        };
+        var network = new vis.Network(container, data, options);
+    </script>
+</body>
+</html>

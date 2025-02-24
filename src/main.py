@@ -148,3 +148,5 @@ for external_data in external_lsa_5:
         
 
 print(network_topology)
+
+# print(network_topology.toJSON())
