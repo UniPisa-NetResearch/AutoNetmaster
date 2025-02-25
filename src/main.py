@@ -145,8 +145,50 @@ for external_data in external_lsa_5:
         route = Route(ip, mask, via, metric, metric_type)
         
         network_topology.add_external_network(route)
+
+while True:
+        cmd = input("> ").strip() 
         
+        if cmd.startswith("ip "):
+            ip = cmd[3:] 
+            print(f"Indirizzo IP ricevuto: {ip}")
 
-print(network_topology)
+            selected_node = pyeapi.client.connect(
+                transport="https",
+                host="172.16.0.245",
+                username="admin",
+                password="admin",
+                return_node=True
+            )
 
-# print(network_topology.toJSON())
+            hostname = (selected_node.enable('show hostname'))[0]['result']['hostname']
+
+            interfaces = get_interfaces(selected_node)
+
+            route_table = get_route_table(selected_node)
+
+            protocol_info = get_protocol_info(selected_node)
+
+            neighbors = get_neighbors(selected_node)
+
+            router = Node(protocol_info['Router ID'], hostname, interfaces, neighbors, route_table)
+
+            print(f"\n{router}\n")
+
+        elif cmd == "topology":
+            print(network_topology)
+
+        elif cmd == "help":
+            print("""
+                Comandi disponibili:
+                ip [INDIRIZZO_IP] - Ottieni informazioni sul nodo di rete con un'interfaccia avente l'indirizzo IP specificato.
+                topology          - Stampa la topologia della rete.
+                display           - Avvia un'interfaccia web per la visualizzazione grafica della topologia.
+                exit              - Esci dal programma.
+                """) 
+
+        elif cmd == "exit":
+            sys.exit(0)
+
+        else:
+            print("Comando non riconosciuto. Digita 'help' per assistenza.")
