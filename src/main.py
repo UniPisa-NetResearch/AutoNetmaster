@@ -1,5 +1,9 @@
 import pyeapi
 import sys
+import time
+import webbrowser
+from threading import Thread
+from urllib.parse import quote
 
 from protocol.protocol_info import *
 from interfaces.get_interfaces import *
@@ -11,6 +15,10 @@ from lsa_3.summary_lsa import *
 from lsa_4.asbr_summary_lsa import *
 from lsa_5.external_lsa import *
 from utilities import *
+
+def run_flask():
+    from gui.gui import app
+    app.run(debug=True, use_reloader=False)
 
 if len(sys.argv) < 2:
     sys.stderr.write('ERRORE: nodo target non fornito in input\n')
@@ -151,41 +159,29 @@ while True:
         
         if cmd.startswith("ip "):
             ip = cmd[3:] 
-            print(f"Indirizzo IP ricevuto: {ip}")
-
-            selected_node = pyeapi.client.connect(
-                transport="https",
-                host="172.16.0.245",
-                username="admin",
-                password="admin",
-                return_node=True
-            )
-
-            hostname = (selected_node.enable('show hostname'))[0]['result']['hostname']
-
-            interfaces = get_interfaces(selected_node)
-
-            route_table = get_route_table(selected_node)
-
-            protocol_info = get_protocol_info(selected_node)
-
-            neighbors = get_neighbors(selected_node)
-
-            router = Node(protocol_info['Router ID'], hostname, interfaces, neighbors, route_table)
-
-            print(f"\n{router}\n")
+            print(ip)
 
         elif cmd == "topology":
             print(network_topology)
 
         elif cmd == "help":
             print("""
-                Comandi disponibili:
-                ip [INDIRIZZO_IP] - Ottieni informazioni sul nodo di rete con un'interfaccia avente l'indirizzo IP specificato.
-                topology          - Stampa la topologia della rete.
-                display           - Avvia un'interfaccia web per la visualizzazione grafica della topologia.
-                exit              - Esci dal programma.
+        Comandi disponibili:
+            ip [INDIRIZZO_IP] - Ottieni informazioni sul nodo di rete con un'interfaccia avente l'indirizzo IP specificato.
+            topology          - Stampa la topologia della rete.
+            display           - Avvia un'interfaccia web per la visualizzazione grafica della topologia.
+            exit              - Esci dal programma.
                 """) 
+            
+        elif cmd == "display":
+            flask_thread = Thread(target=run_flask, daemon=True)
+            flask_thread.start()
+
+            enc_data = quote(network_topology.toJSON())
+            url = f"http://127.0.0.1:5000/?data={enc_data}"
+
+            time.sleep(2)
+            webbrowser.open(url)
 
         elif cmd == "exit":
             sys.exit(0)

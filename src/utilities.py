@@ -190,6 +190,7 @@ class Link:
 
     def set_mask(self, mask):
         self.mask = mask
+        self.id = and_bit_to_bit(self.id, mask)
 
     def set_dr_bdr(self, dr, bdr):
         self.dr = dr
@@ -237,3 +238,13 @@ class Path_To_ASBR:
             "via": self.via,
             "metric": self.metric
         }
+
+
+def and_bit_to_bit(address, mask):
+    address_parts = list(map(int, address.split('.')))
+    mask_parts = list(map(int, mask.split('.')))
+    
+    net_address_parts = [address_parts[i] & mask_parts[i] for i in range(4)]
+    
+    net_address = '.'.join(map(str, net_address_parts))
+    return net_address

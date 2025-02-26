@@ -9,34 +9,102 @@
 </head>
 <body>
     <h1>Network Topology</h1>
-    <div id="network" style="width: 100%; height: 500px;"></div>
+    <div id="network" style="width: 100%; height: 1000px;"></div>
 
     <script type="text/javascript">
-        var networkData = JSON.parse({{ data|safe }});
+        var networkData = {{ data|safe }};
+        console.log(networkData);
+
+        var nodes = [];
+        var edges = [];
+
+        var routerImage = '../static/images/router.svg';
+        var switchImage = '../static/images/switch.png';
         
-        var nodes = new vis.DataSet(networkData.map(item => ({
-            id: item.id,
-            label: item.label,
-        })));
+        networkData.areas.forEach(function(area) {
+            area.nodes.forEach(function(node) {
+                if (!nodes.some(n => n.id === node)) {
+                    nodes.push({
+                        id: node, 
+                        label: node, 
+                        image: routerImage,
+                        shape: 'image',    
+                        size: 30,          
+                        borderWidth: 2
+                    });
+                }
+            });
 
-        var edges = new vis.DataSet(networkData.map(item => ({
-            from: item.from,
-            to: item.to
-        })));
+            area.links.forEach(function(link) {
+                var endpoints = link.endpoints;
+                
+                if (endpoints.length >= 3) {
+                    var switchId = "switch_" + link.id;
+                    
+                    if (!nodes.some(n => n.id === switchId)) {
+                        nodes.push({
+                            id: switchId, 
+                            label: "Switch " + link.id,
+                            image: switchImage,
+                            shape: 'image',
+                            size: 30,
+                            borderWidth: 2
+                        });
+                    }
 
-        var container = document.getElementById('network');
-        var data = {
-            nodes: nodes,
-            edges: edges
-        };
+                    for (var i = 0; i < endpoints.length; i++) {
+                        edges.push({
+                            from: switchId,
+                            to: endpoints[i],
+                            label: link.id,
+                            title: link.type + " - " + link.metric
+                        });
+                    }
+                } else {
+                    var endpoint1 = endpoints[0];
+                    var endpoint2 = endpoints[1];
+                    edges.push({ 
+                        from: endpoint1, 
+                        to: endpoint2, 
+                        label: link.id, 
+                        title: link.type + " - " + link.metric,
+                        arrows: 'none' 
+                    });
+                }
+            });
+        });
+
         var options = {
-            physics: {
-                enabled: true
+            nodes: {
+                shape: 'image',
+                size: 30,
+                font: { size: 14 }
+            },
+            edges: {
+                arrows: 'none',
+                smooth: false,
+                font: { size: 10, align: 'top' }
             },
             layout: {
-                improvedLayout: true
+                randomSeed: 2
+            },
+            physics: {
+                enabled: true,
+                barnesHut: {
+                    gravitationalConstant: -5000,
+                    centralGravity: 0.0,
+                    springLength: 300,
+                    springConstant: 0.01,
+                    damping: 0.5
+                },
+                repulsion: {
+                    nodeDistance: 150
+                }
             }
         };
+
+        var container = document.getElementById('network');
+        var data = { nodes: nodes, edges: edges };
         var network = new vis.Network(container, data, options);
     </script>
 </body>
