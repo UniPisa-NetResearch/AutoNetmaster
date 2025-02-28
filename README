@@ -3,7 +3,7 @@ OSPF management software application
 The purpose of the application is to reconstruct the topology of a given network using information, particularly the OSPF database, stored in a specific router within the network.
 
 
-IMPORTANT: for the test you have to create the bridge and .eapi.conf file in your home directory
+IMPORTANT: for the test you have to create the bridge, the .eapi.conf file in your home directory used by containerlab to deploy the network and activate a venv virtual environment
 
 bridge manual creation:
 > sudo ip link add SW type bridge
@@ -25,5 +25,10 @@ host: 172.20.20.*
 transport: https
 username: admin
 password: admin
-*Use the management interface IP address provided in the output of 'sudo containerlab deploy'
+*use the management interface IP address provided in the output of 'sudo containerlab deploy'
+
+venv activation:
+> source venv/bin/activate
+venv de-activation:
+> deactivate
 

@@ -8,20 +8,51 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/vis-network.min.css') }}">
 </head>
 <body>
-    <h1>Network Topology</h1>
+    <div id="legend" style="padding: 10px; font-family: Arial, sans-serif; border: 2px solid black; width: fit-content;"></div>
     <div id="network" style="width: 100%; height: 1000px;"></div>
 
     <script type="text/javascript">
         var networkData = {{ data|safe }};
         console.log(networkData);
 
+        const colors = [
+            "#0000FF",
+            "#FF0000",
+            "#00FF00",
+            "#FFFF00",
+            "#00FFFF",
+            "#FF00FF",
+            "#FFA500",
+            "#800080" 
+        ];
+
         var nodes = [];
         var edges = [];
 
-        var routerImage = '../static/images/router.svg';
+        var routerImage = '../static/images/router.png';
         var switchImage = '../static/images/switch.png';
         
-        networkData.areas.forEach(function(area) {
+        networkData.areas.forEach(function(area, index) {
+            const areaColor = colors[index % colors.length];
+
+            const legendDiv = document.getElementById('legend');
+            const areaLegend = document.createElement('div');
+            areaLegend.style.marginBottom = '5px';
+
+            const colorBox = document.createElement('span');
+            colorBox.style.display = 'inline-block';
+            colorBox.style.width = '20px';
+            colorBox.style.height = '20px';
+            colorBox.style.backgroundColor = areaColor;
+            colorBox.style.marginRight = '10px';
+
+            const areaName = document.createElement('span');
+            areaName.textContent = "Area " + area.area_id;
+            areaLegend.appendChild(colorBox);
+            areaLegend.appendChild(areaName);
+
+            legendDiv.appendChild(areaLegend);
+
             area.nodes.forEach(function(node) {
                 if (!nodes.some(n => n.id === node)) {
                     nodes.push({
@@ -44,7 +75,7 @@
                     if (!nodes.some(n => n.id === switchId)) {
                         nodes.push({
                             id: switchId, 
-                            label: "Switch " + link.id,
+                            label: "Switch " + link.id + " / " + find_subnet_length(link.mask),
                             image: switchImage,
                             shape: 'image',
                             size: 30,
@@ -56,8 +87,9 @@
                         edges.push({
                             from: switchId,
                             to: endpoints[i],
-                            label: link.id,
-                            title: link.type + " - " + link.metric
+                            label: link.id + " / " + find_subnet_length(link.mask),
+                            title: link.type + " - " + link.metric,
+                            color: { color: areaColor }
                         });
                     }
                 } else {
@@ -66,9 +98,10 @@
                     edges.push({ 
                         from: endpoint1, 
                         to: endpoint2, 
-                        label: link.id, 
+                        label: link.id + " / " + find_subnet_length(link.mask), 
                         title: link.type + " - " + link.metric,
-                        arrows: 'none' 
+                        arrows: 'none',
+                        color: { color: areaColor }
                     });
                 }
             });
@@ -81,7 +114,6 @@
                 font: { size: 14 }
             },
             edges: {
-                arrows: 'none',
                 smooth: false,
                 font: { size: 10, align: 'top' }
             },
@@ -98,7 +130,7 @@
                     damping: 0.5
                 },
                 repulsion: {
-                    nodeDistance: 150
+                    nodeDistance: 120
                 }
             }
         };
@@ -106,6 +138,19 @@
         var container = document.getElementById('network');
         var data = { nodes: nodes, edges: edges };
         var network = new vis.Network(container, data, options);
+
+        function find_subnet_length(mask) {
+            const octets = mask.split('.');
+
+            let bitCount = 0;
+
+            for (let i = 0; i < octets.length; i++) {
+                let binaryOctet = parseInt(octets[i]).toString(2).padStart(8, '0');
+                bitCount += binaryOctet.split('1').length - 1;
+            }
+
+            return bitCount;
+        }
     </script>
 </body>
 </html>
