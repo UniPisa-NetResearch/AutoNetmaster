@@ -9,7 +9,8 @@
 </head>
 <body>
     <div id="legend" style="padding: 10px; font-family: Arial, sans-serif; border: 2px solid black; width: fit-content;"></div>
-    <div id="network" style="width: 100%; height: 1000px;"></div>
+    <div id="network" style="width: 100%; height: 600px;"></div>
+    <div id="info"></div>
 
     <script type="text/javascript">
         var networkData = {{ data|safe }};
@@ -34,23 +35,62 @@
         
         networkData.areas.forEach(function(area, index) {
             const areaColor = colors[index % colors.length];
-
+        
             const legendDiv = document.getElementById('legend');
             const areaLegend = document.createElement('div');
             areaLegend.style.marginBottom = '5px';
-
+            areaLegend.style.cursor = 'pointer'; // Rende l'area cliccabile
+        
             const colorBox = document.createElement('span');
             colorBox.style.display = 'inline-block';
             colorBox.style.width = '20px';
             colorBox.style.height = '20px';
             colorBox.style.backgroundColor = areaColor;
             colorBox.style.marginRight = '10px';
-
+        
             const areaName = document.createElement('span');
             areaName.textContent = "Area " + area.area_id;
+        
             areaLegend.appendChild(colorBox);
             areaLegend.appendChild(areaName);
-
+            
+            areaLegend.addEventListener('click', () => {
+                const infoDiv = document.getElementById('info');
+                infoDiv.innerHTML = ""; 
+        
+                if (area.ospf_inter_area_routes.length > 0) {
+                    const interAreaTitle = document.createElement('h3');
+                    interAreaTitle.textContent = "Rotte Inter-Area OSPF:";
+                    infoDiv.appendChild(interAreaTitle);
+            
+                    const interAreaList = document.createElement('ul');
+                    area.ospf_inter_area_routes.forEach(route => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `Dest: ${route.ip}/${route.mask} via ${route.via}`;
+                        interAreaList.appendChild(listItem);
+                    });
+                    infoDiv.appendChild(interAreaList);
+                } else {
+                    infoDiv.innerHTML += "<p>Nessuna rotta inter-area OSPF</p>";
+                }
+            
+                if (area.paths_to_asbrs.length > 0) {
+                    const asbrTitle = document.createElement('h3');
+                    asbrTitle.textContent = "Percorsi verso ASBR:";
+                    infoDiv.appendChild(asbrTitle);
+            
+                    const asbrList = document.createElement('ul');
+                    area.paths_to_asbrs.forEach(path => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `ASBR: ${path.asbr} via ${path.via} (metrica: ${path.metric})`;
+                        asbrList.appendChild(listItem);
+                    });
+                    infoDiv.appendChild(asbrList);
+                } else {
+                    infoDiv.innerHTML += "<p>Nessun percorso verso ASBR</p>";
+                }
+            });
+        
             legendDiv.appendChild(areaLegend);
 
             area.nodes.forEach(function(node) {
@@ -119,9 +159,12 @@
             },
             layout: {
                 randomSeed: 2
+            },    
+            interaction: {
+                zoomView: false
             },
             physics: {
-                enabled: true,
+                enabled: false/*true,
                 barnesHut: {
                     gravitationalConstant: -5000,
                     centralGravity: 0.0,
@@ -131,7 +174,7 @@
                 },
                 repulsion: {
                     nodeDistance: 120
-                }
+                }*/
             }
         };
 
