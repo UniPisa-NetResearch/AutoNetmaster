@@ -21,8 +21,11 @@
     </style>
 </head>
 <body>
-    <div id="legend" style="padding: 10px; font-family: Arial, sans-serif; border: 2px solid black; width: fit-content;"></div>
-    <div id="network" style="width: 100%; height: 400px;"></div>
+    <div style="display: flex; flex-direction: row; justify-content:start; gap: 10px; align-items: start;">
+        <div id="legend" style="padding: 10px; font-family: Arial, sans-serif; border: 2px solid black; width: fit-content;"></div>
+        <div id="external-routes" style="padding-left: 10px; padding-right: 10px; font-family: Arial, sans-serif; width: fit-content;"></div>
+    </div>
+    <div id="network" style="width: 100%; height: 400px; margin-top: 50px;"></div>
     <div id="info"></div>
 
     <script type="text/javascript">
@@ -156,6 +159,23 @@
             });
         });
 
+        const externalRoutesDiv = document.getElementById('external-routes');
+        if (networkData.external_routes && networkData.external_routes.length > 0) {
+            const externalRoutesTitle = document.createElement('h3');
+            externalRoutesTitle.textContent = "Rotte Esterne:";
+            externalRoutesDiv.appendChild(externalRoutesTitle);
+        
+            const externalRoutesList = document.createElement('ul');
+            networkData.external_routes.forEach(route => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `Dest: ${route.ip}/${route.mask} via ${route.via} (metrica: ${route.metric}, tipo: ${route.metric_type})`;
+                externalRoutesList.appendChild(listItem);
+            });
+            externalRoutesDiv.appendChild(externalRoutesList);
+        } else {
+            externalRoutesDiv.innerHTML += "<p>Nessuna rotta esterna</p>";
+        }
+
         let options = {
             nodes: {
                 shape: 'image',
@@ -182,21 +202,13 @@
         let data = { nodes: nodes, edges: edges };
         let network = new vis.Network(container, data, options);
 
-        network.on("hoverNode", function () {
-            container.style.cursor = "pointer";
-        });
+        network.on("hoverNode", () => { container.style.cursor = "pointer"; });
         
-        network.on("blurNode", function () {
-            container.style.cursor = "default";
-        });
+        network.on("blurNode", () => { container.style.cursor = "default"; });
         
-        network.on("hoverEdge", function () {
-            container.style.cursor = "pointer";
-        });
+        network.on("hoverEdge", () => { container.style.cursor = "pointer"; });
         
-        network.on("blurEdge", function () {
-            container.style.cursor = "default";
-        });
+        network.on("blurEdge", () => { container.style.cursor = "default"; });
 
         network.on("click", function (params) {
             if (params.edges.length > 0 && params.nodes.length === 0) {
@@ -219,8 +231,8 @@
                 infoDiv.innerHTML = `<h3>Dettagli Link</h3>
                     <p><strong>IP:</strong> ${edge.id}</p>
                     <p><strong>Mask:</strong> ${edge.mask}</p>
-                    <p><strong>Tipo:</strong> ${edge.type || "N/A"}</p>
-                    <p><strong>Metric:</strong> ${edge.metric || "N/A"}</p>
+                    <p><strong>Tipo:</strong> ${edge.type }</p>
+                    <p><strong>Metric:</strong> ${edge.metric}</p>
                     <p><strong>Designated Router:</strong> ${edge.dr}</p>
                     <p><strong>Backup Designated Router:</strong> ${edge.bdr}</p>`;
         

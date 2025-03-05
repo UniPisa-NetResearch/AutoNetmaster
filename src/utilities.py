@@ -123,10 +123,11 @@ class Node:
             "line_protocol_status": line_protocol_status
         })
 
-    def add_neighbor(self, interface_id, neighbor_router_id, adjacency_state, designated_router, backup_designated_router):
+    def add_neighbor(self, interface_id, neighbor_router_id, neighbor_ip_addr, adjacency_state, designated_router, backup_designated_router):
         self.neighbors.append({
             "interface_id": interface_id,
             "router_id": neighbor_router_id,
+            "neighbor_ip_addr": neighbor_ip_addr,
             "adjacency_state": adjacency_state,
             "designated_router": designated_router,
             "backup_designated_router": backup_designated_router
@@ -147,9 +148,9 @@ class Node:
             for iface in self.interfaces
         )
         neighbors_str = "\n        ".join(
-            f"Interface ID: {n['interface']}, Router ID: {n['router_id']}, "
-            f"Adjacency State: {n['adjacency_state']}, Designated Router: {n['designated_router']}, "
-            f"Backup Designated Router: {n['backup_designated_router']}" for n in self.neighbors
+            f"Interface: {n['interface']}, Router ID: {n['router_id']}, Neighbor IP address: {n['neighbor_ip_addr']}, "
+            f"Adj-State: {n['adjacency_state']}, DR: {n['designated_router']}, "
+            f"BDR: {n['backup_designated_router']}" for n in self.neighbors
         )
         route_table_str = "\n        ".join(
             f"Destination: {route['ip']}/{route['masklen']}, Via: {route['via']}, "

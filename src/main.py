@@ -188,3 +188,16 @@ while True:
 
         else:
             print("Comando non riconosciuto. Digita 'help' per assistenza.")
+"""
+node = pyeapi.client.connect(
+    transport='https',
+    host='172.20.20.2',
+    username='admin',
+    password='admin',
+    return_node=True
+)
+print(node)
+response = node.enable("show version")
+
+print(response[0]['result'])
+"""

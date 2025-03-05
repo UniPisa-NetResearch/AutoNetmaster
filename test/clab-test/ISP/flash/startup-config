@@ -1,9 +1,9 @@
-! Startup-config last modified at Mon Mar  3 12:03:07 2025 by root
+! Startup-config last modified at Wed Mar  5 10:09:19 2025 by root
 ! device: ISP (cEOSLab, EOS-4.32.0F-36401836.4320F (engineering build))
 !
 no aaa root
 !
-username admin privilege 15 role network-admin secret sha512 $6$hwCh1m0pZnt0KFdC$ypZlMVmTCbS7QgiTWOcDpsPvorcJMNVq926AmddvSlV2j4DvGt6Ytcf.Jl1XM4fEt/gQ34vIssbDvOVvGHZUP1
+username admin privilege 15 role network-admin secret sha512 $6$3DV9mfkkIz2ol7nG$aK9Q7ZJQJv3OMvb0oTmbiwVCJW0IgKibNIh15VL130l1v43yV5Di0ujTNB9/OBq.YEDBf2DJ3qLdUKLObsbq81
 !
 transceiver qsfp default-mode 4x10G
 !
@@ -25,8 +25,8 @@ interface Ethernet1
    ip address 209.165.201.34/30
 !
 interface Management0
-   ip address 172.20.20.5/24
-   ipv6 address 3fff:172:20:20::5/64
+   ip address 172.20.20.4/24
+   ipv6 address 3fff:172:20:20::4/64
 !
 ip routing
 !
