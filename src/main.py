@@ -161,6 +161,29 @@ while True:
             ip = cmd[3:] 
             print(ip)
 
+            other_node = pyeapi.client.connect(
+                transport='https',
+                host=ip,
+                username='admin',
+                password='admin',
+                return_node=True
+            )
+
+            hostname = (other_node.enable('show hostname'))[0]['result']['hostname']
+
+            interfaces = get_interfaces(other_node)
+
+            route_table = get_route_table(other_node)
+
+            protocol_info = get_protocol_info(other_node)
+
+            neighbors = get_neighbors(other_node)
+
+            other_router = Node(protocol_info['Router ID'], hostname, interfaces, neighbors, route_table)
+
+            print(f"\n{other_router}\n")
+
+
         elif cmd == "topology":
             print(network_topology)
 
@@ -188,16 +211,4 @@ while True:
 
         else:
             print("Comando non riconosciuto. Digita 'help' per assistenza.")
-"""
-node = pyeapi.client.connect(
-    transport='https',
-    host='172.20.20.2',
-    username='admin',
-    password='admin',
-    return_node=True
-)
-print(node)
-response = node.enable("show version")
 
-print(response[0]['result'])
-"""

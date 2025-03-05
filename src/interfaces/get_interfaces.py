@@ -7,8 +7,6 @@ def get_interfaces(target_node):
     interfaces = []
     interface_list = result[0]['result']['interfaces']
 
-    print(json.dumps(interface_list, indent=2))
-
     for interface_name, interface_details in interface_list.items():
         interface_info = {
             'name': interface_name,

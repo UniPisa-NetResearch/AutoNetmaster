@@ -6,9 +6,7 @@ def get_neighbors(target_node):
     
     neighbors_list = []
     ospf_neighbors = neighbors_data[0]['result']['vrfs']['default']['instList']['1']['ospfNeighborEntries']
-
-    print(json.dumps(ospf_neighbors, indent=2))
-    
+        
     for neighbor in ospf_neighbors:
         neighbor_info = {
             "router_id": neighbor['routerId'],
