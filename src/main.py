@@ -154,35 +154,43 @@ for external_data in external_lsa_5:
         
         network_topology.add_external_network(route)
 
+# recupero informazioni dettagliate sui nodi vicini
+
+network_routers = []
+
+for neighbor in neighbors:
+    neigh_node = pyeapi.client.connect(
+        transport='https',
+        host=neighbor["neighbor_ip_addr"],
+        username='admin',
+        password='admin',
+        return_node=True
+    )
+
+    hostname = (neigh_node.enable('show hostname'))[0]['result']['hostname']
+
+    interfaces = get_interfaces(neigh_node)
+
+    route_table = get_route_table(neigh_node)
+
+    protocol_info = get_protocol_info(neigh_node)
+
+    neighbors = get_neighbors(neigh_node)
+
+    neigh_router = Node(protocol_info['Router ID'], hostname, interfaces, neighbors, route_table)
+
+    network_routers.append(neigh_router)
+
+
 while True:
         cmd = input("> ").strip() 
         
-        if cmd.startswith("ip "):
-            ip = cmd[3:] 
-            print(ip)
+        if cmd.startswith("id "):
+            id = cmd[3:] 
+            print(id)
 
-            other_node = pyeapi.client.connect(
-                transport='https',
-                host=ip,
-                username='admin',
-                password='admin',
-                return_node=True
-            )
-
-            hostname = (other_node.enable('show hostname'))[0]['result']['hostname']
-
-            interfaces = get_interfaces(other_node)
-
-            route_table = get_route_table(other_node)
-
-            protocol_info = get_protocol_info(other_node)
-
-            neighbors = get_neighbors(other_node)
-
-            other_router = Node(protocol_info['Router ID'], hostname, interfaces, neighbors, route_table)
-
-            print(f"\n{other_router}\n")
-
+            matching_router = [router for router in network_routers if router.router_id == id]
+            print(matching_router[0])
 
         elif cmd == "topology":
             print(network_topology)
@@ -190,7 +198,7 @@ while True:
         elif cmd == "help":
             print("""
         Comandi disponibili:
-            ip [INDIRIZZO_IP] - Ottieni informazioni sul nodo di rete con un'interfaccia avente l'indirizzo IP specificato.
+            id [ospf_id] - Ottieni informazioni sul nodo di rete con un'interfaccia avente l'indirizzo IP specificato.
             topology          - Stampa la topologia della rete.
             display           - Avvia un'interfaccia web per la visualizzazione grafica della topologia.
             exit              - Esci dal programma.

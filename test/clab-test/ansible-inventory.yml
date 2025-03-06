@@ -14,13 +14,13 @@ all:
         clab-test-A:
           ansible_host: 172.20.20.6
         clab-test-ASBR:
-          ansible_host: 172.20.20.5
-        clab-test-B:
           ansible_host: 172.20.20.2
+        clab-test-B:
+          ansible_host: 172.20.20.3
         clab-test-C:
           ansible_host: 172.20.20.4
         clab-test-ISP:
-          ansible_host: 172.20.20.3
+          ansible_host: 172.20.20.5
     bridge:
       hosts:
         clab-test-SW:

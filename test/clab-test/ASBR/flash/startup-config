@@ -1,9 +1,9 @@
-! Startup-config last modified at Wed Mar  5 16:48:30 2025 by root
+! Startup-config last modified at Thu Mar  6 10:46:57 2025 by root
 ! device: ASBR (cEOSLab, EOS-4.32.0F-36401836.4320F (engineering build))
 !
 no aaa root
 !
-username admin privilege 15 role network-admin secret sha512 $6$l5ox/T7QXBVcYx1V$XPCg5AQFbusB33lxG4Pn22649GwGrJoRxgnCy1BvKiJtCxqE.8EHn6OdURkfeZlCbopeABh6SubzT6g/Zw21l/
+username admin privilege 15 role network-admin secret sha512 $6$JnBlrV5PhR3/51SN$ZqEJUk/HvzsoQmtoKaIa7V44ut19kt/rBeg4VzyLZhtG3w4uol8ZvU8WnwObZT6793Zc1EZ5cA27P6hDO6g6V1
 !
 transceiver qsfp default-mode 4x10G
 !
@@ -29,8 +29,8 @@ interface Ethernet2
    ip address 209.165.201.33/30
 !
 interface Management0
-   ip address 172.20.20.5/24
-   ipv6 address 3fff:172:20:20::5/64
+   ip address 172.20.20.2/24
+   ipv6 address 3fff:172:20:20::2/64
 !
 ip routing
 !

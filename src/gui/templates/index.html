@@ -48,6 +48,7 @@
 
         let routerImage = '../static/images/router.png';
         let switchImage = '../static/images/switch.png';
+        let monitorImage = '../static/images/monitor.png';
         
         networkData.areas.forEach(function(area, index) {
             const areaColor = colors[index % colors.length];
@@ -120,8 +121,30 @@
 
             area.links.forEach(function(link) {
                 let endpoints = link.endpoints;
+
+                if (endpoints.length === 1){
+                    console.log('ciao')
+
+                    nodes.push({
+                        id: 'Console', 
+                        label: "Console",
+                        image: monitorImage,
+                        shape: 'image',
+                        size: 30,
+                        borderWidth: 2
+                    });
+
+                    edges.push({
+                        from: 'Console',
+                        to: endpoints[0],
+                        label: link.id,
+                        title:link.id,
+                        arrows: 'none',
+                        color: { color: areaColor }
+                    })
+                }
                 
-                if (endpoints.length >= 3) {
+                else if (endpoints.length >= 3) {
                     let switchId = "switch_" + link.id;
                     
                     if (!nodes.some(n => n.id === switchId)) {
@@ -140,7 +163,7 @@
                             from: switchId,
                             to: endpoints[i],
                             label: link.id + " / " + find_subnet_length(link.mask),
-                            title: link.type + " - " + link.metric,
+                            title: link.id,
                             color: { color: areaColor }
                         });
                     }
@@ -151,7 +174,7 @@
                         from: endpoint1, 
                         to: endpoint2, 
                         label: link.id + " / " + find_subnet_length(link.mask), 
-                        title: link.type + " - " + link.metric,
+                        title: link.id,
                         arrows: 'none',
                         color: { color: areaColor }
                     });
@@ -245,6 +268,7 @@
         });        
 
         function find_subnet_length(mask) {
+            console.log(mask)
             const octets = mask.split('.');
 
             let bitCount = 0;
