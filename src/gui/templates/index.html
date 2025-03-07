@@ -25,12 +25,15 @@
         <div id="legend" style="padding: 10px; font-family: Arial, sans-serif; border: 2px solid black; width: fit-content;"></div>
         <div id="external-routes" style="padding-left: 10px; padding-right: 10px; font-family: Arial, sans-serif; width: fit-content;"></div>
     </div>
-    <div id="network" style="width: 100%; height: 400px; margin-top: 50px;"></div>
+    <div id="network" style="width: 100%; height: 500px; margin-top: 50px;"></div>
     <div id="info"></div>
 
     <script type="text/javascript">
         let networkData = {{ data|safe }};
         console.log(networkData);
+
+        let networkRouters = {{ network_routers|safe }};
+        console.log(networkRouters)
 
         const colors = [
             "#0000FF",
@@ -123,8 +126,6 @@
                 let endpoints = link.endpoints;
 
                 if (endpoints.length === 1){
-                    console.log('ciao')
-
                     nodes.push({
                         id: 'Console', 
                         label: "Console",
@@ -233,6 +234,11 @@
         
         network.on("blurEdge", () => { container.style.cursor = "default"; });
 
+        function updateInfo(inner) {
+            let infoDiv = document.getElementById('info')
+            infoDiv.innerHTML = inner;
+        }
+
         network.on("click", function (params) {
             if (params.edges.length > 0 && params.nodes.length === 0) {
                 let edgeId = params.edges[0];
@@ -246,7 +252,7 @@
                 }
         
                 if (!edge) {
-                    console.warn("Nessun link trovato con label:", targetEdge.label);
+                    console.warn("Nessun link trovato con: ", targetEdge.label);
                     return;
                 }
 
@@ -254,21 +260,72 @@
                 infoDiv.innerHTML = `<h3>Dettagli Link</h3>
                     <p><strong>IP:</strong> ${edge.id}</p>
                     <p><strong>Mask:</strong> ${edge.mask}</p>
-                    <p><strong>Tipo:</strong> ${edge.type }</p>
+                    <p><strong>Tipo:</strong> ${edge.type}</p>
                     <p><strong>Metric:</strong> ${edge.metric}</p>
-                    <p><strong>Designated Router:</strong> ${edge.dr}</p>
-                    <p><strong>Backup Designated Router:</strong> ${edge.bdr}</p>`;
-        
-                if (edge.endpoints) {
-                    infoDiv.innerHTML += `<p><strong>Endpoints:</strong> ${edge.endpoints.join(", ")}</p>`;
-                } else {
-                    infoDiv.innerHTML += `<p>Endpoints non disponibili</p>`;
-                }
+                    ${edge.dr ? `<p><strong>Designated Router:</strong> ${edge.dr}</p>` : ''}
+                    ${edge.bdr ? `<p><strong>Backup Designated Router:</strong> ${edge.bdr}</p>` : ''}
+                    <p><strong>Endpoints:</strong> ${edge.endpoints.join(", ")}</p>`;
             }
+            else if (params.nodes.length > 0) {
+                let nodeId = params.nodes[0];
+
+                let targetNode = nodes.find(n => n.id === nodeId);
+
+                let node = networkRouters[targetNode.id];
+
+                if(node === null){
+                    console.warn("I nodi non router non possono essere selezionati");
+                    return;
+                }
+
+                let infoDiv = document.getElementById('info');
+
+                infoDiv.innerHTML = `
+                    <h3>Hostname: ${node.hostname}</h3>
+                    <p><strong>Router ID:</strong> ${node.router_id}</p>
+                
+                    <h4>Interfaces:</h4>
+                    <ul>
+                    ${node.interfaces.map(iface => `
+                        <li>
+                        <strong>${iface.name}</strong>
+                        <strong>IP:</strong> ${iface.ip}
+                        <strong>Masklen:</strong> ${iface.masklen}
+                        <strong>Status:</strong> ${iface.interface_status}
+                        <strong>Line Protocol:</strong> ${iface.line_protocol_status}
+                        </li>
+                    `).join('')}
+                    </ul>
+                
+                    <h4>Neighbors:</h4>
+                    <ul>
+                    ${node.neighbors.map(neighbor => `
+                        <li>
+                        <strong>Router ID:</strong> ${neighbor.router_id}
+                        <strong>Interface:</strong> ${neighbor.interface}
+                        <strong>Neighbor IP:</strong> ${neighbor.neighbor_ip_addr}
+                        <strong>Adjacency State:</strong> ${neighbor.adjacency_state}
+                        </li>
+                    `).join('')}
+                    </ul>
+                
+                    <h4>Routing Table:</h4>
+                    <ul>
+                    ${node.route_table.map(route => `
+                        <li>
+                        <strong>IP:</strong> ${route.ip}
+                        <strong>Masklen:</strong> ${route.masklen}
+                        <strong>Via:</strong> ${route.via}
+                        <strong>Interface:</strong> ${route.interface}
+                        <strong>Protocol:</strong> ${route.protocol}
+                        </li>
+                    `).join('')}
+                    </ul>`;
+
+             }
         });        
 
         function find_subnet_length(mask) {
-            console.log(mask)
             const octets = mask.split('.');
 
             let bitCount = 0;

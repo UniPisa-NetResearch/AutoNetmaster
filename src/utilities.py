@@ -33,13 +33,15 @@ class Network:
             topology_str += f"\n    - metric: {route.metric}"
             topology_str += f"\n    - metric_type: {route.metric_type}"
 
+        topology_str += "\n"
+
         return topology_str
     
     def toJSON(self):
         return json.dumps({
             "areas": [area.toJSON() for area in self.areas],
             "external_routes": [route.toJSON() for route in self.external_routes]
-        }, indent=4)
+        }, indent=None)
 
 class Area:
     def __init__(self, area_id):
@@ -144,11 +146,11 @@ class Node:
 
     def __str__(self):
         interface_str = "\n        ".join(
-            f"ID: {iface['name']}, IP: {iface['ip']}/{iface['masklen']}, Interface Status: {iface['interface_status']}, Line Protocol Status: {iface['line_protocol_status']}"
+            f"ID: {iface['name']}, ip: {iface['ip']}/{iface['masklen']}, Interface Status: {iface['interface_status']}, Line Protocol Status: {iface['line_protocol_status']}"
             for iface in self.interfaces
         )
         neighbors_str = "\n        ".join(
-            f"Interface: {n['interface']}, Router ID: {n['router_id']}, Neighbor IP address: {n['neighbor_ip_addr']}, "
+            f"Interface: {n['interface']}, Router ID: {n['router_id']}, Neighbor ip address: {n['neighbor_ip_addr']}, "
             f"Adj-State: {n['adjacency_state']}, DR: {n['designated_router']}, "
             f"BDR: {n['backup_designated_router']}" for n in self.neighbors
         )
@@ -166,13 +168,13 @@ class Node:
         )
     
     def toJSON(self):
-        return {
+        return json.dumps({
             "hostname": self.hostname,
             "router_id": self.router_id,
-            "interfaces": self.interfaces,
-            "neighbors": self.neighbors,
-            "route_table": self.route_table
-        }
+            "interfaces": [dict(interface) for interface in self.interfaces],
+            "neighbors": [dict(neighbor) for neighbor in self.neighbors],
+            "route_table": [dict(route) for route in self.route_table]
+        }, indent=4)
 
 
 class Link:

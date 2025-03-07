@@ -3,6 +3,7 @@ import sys
 import time
 import webbrowser
 from threading import Thread
+from queue import Queue
 from urllib.parse import quote
 
 from protocol.protocol_info import *
@@ -74,6 +75,10 @@ for area_data in router_lsa_1:
                     existing_link.add_endpoint(link_state_id)
                 else:
                     new_link = Link(id=link_id, type=link_type, options=None, metric=metric, endpoints=[link_state_id])
+
+                    if(link_type == "stubNetwork"):
+                        new_link.set_mask(router_link['linkData'])
+                    
                     new_area.add_link(new_link)
 
     network_topology.add_area(new_area)
@@ -154,65 +159,87 @@ for external_data in external_lsa_5:
         
         network_topology.add_external_network(route)
 
-# recupero informazioni dettagliate sui nodi vicini
-
-network_routers = []
-
-for neighbor in neighbors:
-    neigh_node = pyeapi.client.connect(
+def discover_router(ip_addr):
+    """Connette al router dato l'IP e ne estrae le informazioni."""
+    node = pyeapi.client.connect(
         transport='https',
-        host=neighbor["neighbor_ip_addr"],
+        host=ip_addr,
         username='admin',
         password='admin',
         return_node=True
     )
 
-    hostname = (neigh_node.enable('show hostname'))[0]['result']['hostname']
+    hostname = (node.enable('show hostname'))[0]['result']['hostname']
+    interfaces = get_interfaces(node)
+    route_table = get_route_table(node)
+    protocol_info = get_protocol_info(node)
+    neighbors = get_neighbors(node)
 
-    interfaces = get_interfaces(neigh_node)
+    router_id = protocol_info['Router ID']
 
-    route_table = get_route_table(neigh_node)
+    return Node(router_id, hostname, interfaces, neighbors, route_table), neighbors
 
-    protocol_info = get_protocol_info(neigh_node)
+network_routers = {router.router_id: router}  # Mappa router_id -> Node
+discovered_ips = {router.router_id: router.neighbors}  # Mappa router_id -> IP dei vicini
+queue = Queue()  
+queue.put(router) 
 
-    neighbors = get_neighbors(neigh_node)
+while not queue.empty():
+    current_router = queue.get()
+    neighbors_dict = {n["router_id"]: n for n in current_router.neighbors}
 
-    neigh_router = Node(protocol_info['Router ID'], hostname, interfaces, neighbors, route_table)
+    for nghb in current_router.neighbors:
+        nghb_id = nghb['router_id']
+        nghb_ip = nghb['neighbor_ip_addr']
 
-    network_routers.append(neigh_router)
-
+        if nghb_id not in network_routers and nghb_id != router.router_id:
+            new_router, new_neighbors = discover_router(nghb_ip)
+            network_routers[nghb_id] = new_router
+            queue.put(new_router)
 
 while True:
         cmd = input("> ").strip() 
         
         if cmd.startswith("id "):
             id = cmd[3:] 
-            print(id)
+            matching_router = network_routers.get(id)
+            if(matching_router != None):
+                print(matching_router)
+                print('\n')
+            else:
+                print("Non esistono router con l'id selezionato")
 
-            matching_router = [router for router in network_routers if router.router_id == id]
-            print(matching_router[0])
+        elif cmd == "nodes":
+            print('NODES:\n')
+            for router in network_routers.values():
+                print(router)
+                print('\n')
 
         elif cmd == "topology":
             print(network_topology)
 
-        elif cmd == "help":
-            print("""
-        Comandi disponibili:
-            id [ospf_id] - Ottieni informazioni sul nodo di rete con un'interfaccia avente l'indirizzo IP specificato.
-            topology          - Stampa la topologia della rete.
-            display           - Avvia un'interfaccia web per la visualizzazione grafica della topologia.
-            exit              - Esci dal programma.
-                """) 
-            
         elif cmd == "display":
             flask_thread = Thread(target=run_flask, daemon=True)
             flask_thread.start()
 
+            network_routers_json = {router_id: json.loads(router.toJSON()) for router_id, router in network_routers.items()}
             enc_data = quote(network_topology.toJSON())
+            enc_data += "&network_routers=" + quote(str(network_routers_json))
+
             url = f"http://127.0.0.1:5000/?data={enc_data}"
 
             time.sleep(2)
             webbrowser.open(url)
+
+        elif cmd == "help":
+            print("""
+        Comandi disponibili:
+            id [ospf_id]      - Ottieni informazioni sul nodo di rete con un'interfaccia avente l'ID ospf specificato.
+            nodes             - Mostra le caratteristiche dei nodi della rete
+            topology          - Stampa la topologia della rete.
+            display           - Avvia un'interfaccia web per la visualizzazione grafica della topologia.
+            exit              - Esci dal programma.
+                """) 
 
         elif cmd == "exit":
             sys.exit(0)
