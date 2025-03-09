@@ -29,6 +29,9 @@
     <div id="info"></div>
 
     <script type="text/javascript">
+        let router = "{{ target|safe }}";
+        console.log(router);
+
         let networkData = {{ data|safe }};
         console.log(networkData);
 
@@ -82,7 +85,7 @@
                     const interAreaList = document.createElement('ul');
                     area.ospf_inter_area_routes.forEach(route => {
                         const listItem = document.createElement('li');
-                        listItem.textContent = `Dest: ${route.ip}/${route.mask} via ${route.via}`;
+                        listItem.textContent = `Dest: ${route.ip}/${find_subnet_length(route.mask)} via ${route.via}`;
                         interAreaList.appendChild(listItem);
                     });
                     infoDiv.appendChild(interAreaList);
@@ -138,7 +141,7 @@
                     edges.push({
                         from: 'Console',
                         to: endpoints[0],
-                        label: link.id,
+                        label: link.id + " / " + find_subnet_length(link.mask),
                         title:link.id,
                         arrows: 'none',
                         color: { color: areaColor }
@@ -192,7 +195,7 @@
             const externalRoutesList = document.createElement('ul');
             networkData.external_routes.forEach(route => {
                 const listItem = document.createElement('li');
-                listItem.textContent = `Dest: ${route.ip}/${route.mask} via ${route.via} (metrica: ${route.metric}, tipo: ${route.metric_type})`;
+                listItem.textContent = `Dest: ${route.ip}/${find_subnet_length(route.mask)} via ${route.via} (metrica: ${route.metric}, tipo: ${route.metric_type})`;
                 externalRoutesList.appendChild(listItem);
             });
             externalRoutesDiv.appendChild(externalRoutesList);

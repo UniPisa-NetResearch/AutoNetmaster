@@ -225,6 +225,7 @@ while True:
             network_routers_json = {router_id: json.loads(router.toJSON()) for router_id, router in network_routers.items()}
             enc_data = quote(network_topology.toJSON())
             enc_data += "&network_routers=" + quote(str(network_routers_json))
+            enc_data += "&target=" + quote(str(router.router_id))
 
             url = f"http://127.0.0.1:5000/?data={enc_data}"
 
@@ -234,7 +235,7 @@ while True:
         elif cmd == "help":
             print("""
         Comandi disponibili:
-            id [ospf_id]      - Ottieni informazioni sul nodo di rete con un'interfaccia avente l'ID ospf specificato.
+            id [ospf_id]      - Ottieni informazioni sul nodo di rete l'ID ospf specificato.
             nodes             - Mostra le caratteristiche dei nodi della rete
             topology          - Stampa la topologia della rete.
             display           - Avvia un'interfaccia web per la visualizzazione grafica della topologia.
