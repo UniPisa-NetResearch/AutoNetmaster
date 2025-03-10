@@ -1,31 +1,20 @@
 OSPF management software application
 
-The purpose of the application is to reconstruct the topology of a given network using information, particularly the OSPF database, stored in a specific router within the network.
+
+L'obiettivo dell'applicazione è ricostruire la topologia di una data rete usando le informazioni contenute all'interno id uno specifico router della suddetta rete, in particolare il database ospf.
 
 
-IMPORTANT: for the test you have to create the bridge, the .eapi.conf file in your home directory used by containerlab to deploy the network and activate a venv virtual environment
+(!!!) Per testare l'applicazione è necessario definire un link tra l'host su cui la rete è emulata la rete grazie a CONTAINERlab e il router il cui database ospf sarà usato per ricostruire la rete. E' quindi necessario aggiornare le tabelle di routing della macchina host e del router interessato (sul router interessato è necessario attivare anche ospf). Inoltre è necessario creare un'interfaccia di rete con il medesimo del nodo se nella rete è presente uno switch (o per meglio dire un bridge) all'interno della rete e attivare venv. (Quest'ultima procedura è automatizzata nello script ospf_mgmt.sh)
+
+host route table update:
+sudo ip addr add "$ip"/"$mask" dev veth-host
+sudo ip route add "$net_ip"/"$net_mask" via "$gateaway"
+
 
 bridge manual creation:
 > sudo ip link add SW type bridge
 > sudo ip link set SW up
 > ip link show SW
-
-.eapi.conf:
-[connection:clab-test-A]
-host: 172.20.20.*
-[connection:clab-test-ASBR]
-host: 172.20.20.*
-[connection:clab-test-B]
-host: 172.20.20.*
-[connection:clab-test-C]
-host: 172.20.20.*
-[connection:clab-test-ISP]
-host: 172.20.20.*
-[DEFAULT]
-transport: https
-username: admin
-password: admin
-*use the management interface IP address provided in the output of 'sudo containerlab deploy'
 
 venv activation:
 > source venv/bin/activate

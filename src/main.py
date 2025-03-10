@@ -29,7 +29,13 @@ input_node = sys.argv[1]
 
 print('**** OSPF Management APP ****\n')
 
-target_node = pyeapi.connect_to(input_node)
+target_node = pyeapi.client.connect(
+    transport='https',
+    host=input_node,
+    username='admin',
+    password='admin',
+    return_node=True
+)
 
 hostname = (target_node.enable('show hostname'))[0]['result']['hostname']
 
