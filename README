@@ -4,20 +4,19 @@ OSPF management software application
 L'obiettivo dell'applicazione è ricostruire la topologia di una data rete usando le informazioni contenute all'interno id uno specifico router della suddetta rete, in particolare il database ospf.
 
 
-(!!!) Per testare l'applicazione è necessario definire un link tra l'host su cui la rete è emulata la rete grazie a CONTAINERlab e il router il cui database ospf sarà usato per ricostruire la rete. E' quindi necessario aggiornare le tabelle di routing della macchina host e del router interessato (sul router interessato è necessario attivare anche ospf). Inoltre è necessario creare un'interfaccia di rete con il medesimo del nodo se nella rete è presente uno switch (o per meglio dire un bridge) all'interno della rete e attivare venv. (Quest'ultima procedura è automatizzata nello script ospf_mgmt.sh)
+(!!!) 
+Per testare l'applicazione è necessario definire un link virtuale tra l'host su cui la rete è emulata la rete grazie a CONTAINERlab e il router il cui database ospf sarà usato per ricostruire la rete. E' quindi necessario aggiornare le tabelle di routing della macchina host e del router interessato (sul router interessato è necessario attivare anche ospf).
+(Queste procedure sono automatizzata nello script run_ospf_mgmt.sh: una volta selezionato il nodo della rete di interesse basterà specificare l'indirizzo ip e la maschera della sotto rete a cui appartiene il link virtuale tra l'host e il nodo target)
 
 host route table update:
 sudo ip addr add "$ip"/"$mask" dev veth-host
 sudo ip route add "$net_ip"/"$net_mask" via "$gateaway"
 
+E' infine necessario creare manualmente un bridge, poiché CONTAINERlab non supporta nativamente gli switch e l'utilizzo di nodi per la loro emulazione sarebbe prestazionalmente costoso ed inoltre inutile allo scapo di questo applicativo software.
 
 bridge manual creation:
 > sudo ip link add SW type bridge
 > sudo ip link set SW up
 > ip link show SW
 
-venv activation:
-> source venv/bin/activate
-venv de-activation:
-> deactivate
 

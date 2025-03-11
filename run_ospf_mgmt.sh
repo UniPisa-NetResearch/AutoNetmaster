@@ -113,8 +113,6 @@ if [[ -z "$eth_target" ]]; then
   exit 1
 fi
 
-echo $eth_target
-
 echo "    - endpoints: [\"$target:$eth_target\", \"host:veth-host\"]" >> "$topology_file"
 
 netmask_decimal=$(cidr_to_netmask $mask)
@@ -136,7 +134,10 @@ echo "!" >> "$startup_config_file"
 echo "Deploying topology from: test/$test/topology.clab.yaml"
 sudo containerlab deploy -t "test/$test/topology.clab.yaml"
 
+echo "my_ip=$my_ip, mask=$mask"
 sudo ip addr add "$my_ip"/"$mask" dev veth-host
+
+echo "net_ip=$net_ip, net_mask=$net_mask, gateway_ip=$gateway_ip "
 sudo ip route add "$net_ip"/"$net_mask" via "$gateway_ip"
 
 sleep 60

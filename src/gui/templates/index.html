@@ -36,7 +36,10 @@
         console.log(networkData);
 
         let networkRouters = {{ network_routers|safe }};
-        console.log(networkRouters)
+        console.log(networkRouters);
+
+        let networkTarget = '{{ target|safe }}';
+        console.log(networkTarget);
 
         const colors = [
             "#0000FF",
@@ -55,6 +58,8 @@
         let routerImage = '../static/images/router.png';
         let switchImage = '../static/images/switch.png';
         let monitorImage = '../static/images/monitor.png';
+
+        let pcCounter = 0;
         
         networkData.areas.forEach(function(area, index) {
             const areaColor = colors[index % colors.length];
@@ -129,9 +134,18 @@
                 let endpoints = link.endpoints;
 
                 if (endpoints.length === 1){
+                    let new_node;
+
+                    if (isIpInNetwork(networkTarget, link.id + "/" + find_subnet_length(link.mask))) {
+                        new_node = 'Host'
+                    } else {
+                        new_node = 'PC' + pcCounter;
+                        pcCounter++;
+                    }
+
                     nodes.push({
-                        id: 'Console', 
-                        label: "Console",
+                        id: new_node, 
+                        label: new_node,
                         image: monitorImage,
                         shape: 'image',
                         size: 30,
@@ -139,7 +153,7 @@
                     });
 
                     edges.push({
-                        from: 'Console',
+                        from: new_node,
                         to: endpoints[0],
                         label: link.id + " / " + find_subnet_length(link.mask),
                         title:link.id,
@@ -339,6 +353,20 @@
             }
 
             return bitCount;
+        }
+
+        function ipToBinary(ip) {
+            return ip.split('.').map(octet => parseInt(octet, 10).toString(2).padStart(8, '0')).join('');
+        }
+        
+        function isIpInNetwork(ip, network) {
+            const [networkIp, mask] = network.split('/');
+            const maskBits = parseInt(mask, 10);
+            
+            const ipBinary = ipToBinary(ip);
+            const networkBinary = ipToBinary(networkIp);
+            
+            return ipBinary.substring(0, maskBits) === networkBinary.substring(0, maskBits);
         }
     </script>
 </body>

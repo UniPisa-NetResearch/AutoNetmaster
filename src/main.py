@@ -231,7 +231,7 @@ while True:
             network_routers_json = {router_id: json.loads(router.toJSON()) for router_id, router in network_routers.items()}
             enc_data = quote(network_topology.toJSON())
             enc_data += "&network_routers=" + quote(str(network_routers_json))
-            enc_data += "&target=" + quote(str(router.router_id))
+            enc_data += "&target=" + quote(str(input_node))
 
             url = f"http://127.0.0.1:5000/?data={enc_data}"
 

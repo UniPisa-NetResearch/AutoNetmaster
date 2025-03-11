@@ -1,0 +1,218 @@
+{
+  "name": "test",
+  "type": "clab",
+  "clab": {
+    "config": {
+      "prefix": "clab",
+      "mgmt": {
+        "network": "clab",
+        "bridge": "br-0205d9a0c3cd",
+        "ipv4-subnet": "172.20.20.0/24",
+        "ipv4-gw": "172.20.20.1",
+        "ipv6-subnet": "3fff:172:20:20::/64",
+        "ipv6-gw": "3fff:172:20:20::1",
+        "mtu": 1500,
+        "external-access": true
+      }
+    }
+  },
+  "ssh-pub-keys": ["ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC/AWGsfORPQYgrRmwGnsqoFZtEcz0T3vbOuz+4O5llXVCzZeB984WLkm+IWvG2OIjEGr5dNaJUbisfAEvH8wU3qpDaL/ZpoPVuaZPItKeqx+DlMNRZ1iAIzYryaicvzP3ypQjukj7Kd8arLUGlsqsQ1fuwMfeFNLRsp9hjK2Ssk2NVetSGdesE3bh3Qd96s/kw7xocY9sqLEj+R+sM74hsXn0/M9OqHgWzIY0Jpco8gUtt4aOwtFki2bs5HUkjSREYSmGuMG2eOAb5YK0tB5t+kp21D/9b613MDl7T0xhLWp96dzVkas5D1yb12A00oypanVnJuEFXvgyQH6qQUs2obVcwmbd3hdguOJUAo/eUyBWnR/G5LPi/SkJKPVESvRmI703CpZTir9HXw0BUdA6AjlPGoqGqq534xEBE/rk2KUF1Nvxj8XMHLzx4iKVRjomQxJZS2VBiysaKcp986ZC95v4YSvbsrMWbSZWSxMDg/t9OrYkgRwRtm5Gjjr+KmN8="],
+  "nodes": {
+    "A": {
+      "index": "0",
+      "shortname": "A",
+      "longname": "clab-test-A",
+      "fqdn": "A.test.io",
+      "group": "",
+      "labdir": "/home/lorenzo/ospf-mgmt-app/test/test2/clab-test/A",
+      "kind": "arista_ceos",
+      "image": "ceos:4.32.0F",
+      "mgmt-net": "",
+      "mgmt-intf": "Management0",
+      "mgmt-ipv4-address": "172.20.20.5",
+      "mgmt-ipv4-prefix-length": 24,
+      "mgmt-ipv6-address": "3fff:172:20:20::5",
+      "mgmt-ipv6-prefix-length": 64,
+      "mac-address": "00:1c:73:01:03:e8",
+      "labels": {
+        "clab-mgmt-net-bridge": "br-0205d9a0c3cd",
+        "clab-node-group": "",
+        "clab-node-kind": "arista_ceos",
+        "clab-node-lab-dir": "/home/lorenzo/ospf-mgmt-app/test/test2/clab-test/A",
+        "clab-node-longname": "clab-test-A",
+        "clab-node-name": "A",
+        "clab-node-type": "",
+        "clab-owner": "lorenzo",
+        "clab-topo-file": "/home/lorenzo/ospf-mgmt-app/test/test2/topology.clab.yaml",
+        "containerlab": "test"
+      },
+      "port-bindings": [
+      ]
+    },
+    "B": {
+      "index": "1",
+      "shortname": "B",
+      "longname": "clab-test-B",
+      "fqdn": "B.test.io",
+      "group": "",
+      "labdir": "/home/lorenzo/ospf-mgmt-app/test/test2/clab-test/B",
+      "kind": "arista_ceos",
+      "image": "ceos:4.32.0F",
+      "mgmt-net": "",
+      "mgmt-intf": "Management0",
+      "mgmt-ipv4-address": "172.20.20.2",
+      "mgmt-ipv4-prefix-length": 24,
+      "mgmt-ipv6-address": "3fff:172:20:20::2",
+      "mgmt-ipv6-prefix-length": 64,
+      "mac-address": "00:1c:73:60:2d:4f",
+      "labels": {
+        "clab-mgmt-net-bridge": "br-0205d9a0c3cd",
+        "clab-node-group": "",
+        "clab-node-kind": "arista_ceos",
+        "clab-node-lab-dir": "/home/lorenzo/ospf-mgmt-app/test/test2/clab-test/B",
+        "clab-node-longname": "clab-test-B",
+        "clab-node-name": "B",
+        "clab-node-type": "",
+        "clab-owner": "lorenzo",
+        "clab-topo-file": "/home/lorenzo/ospf-mgmt-app/test/test2/topology.clab.yaml",
+        "containerlab": "test"
+      },
+      "port-bindings": [
+      ]
+    },
+    "C": {
+      "index": "2",
+      "shortname": "C",
+      "longname": "clab-test-C",
+      "fqdn": "C.test.io",
+      "group": "",
+      "labdir": "/home/lorenzo/ospf-mgmt-app/test/test2/clab-test/C",
+      "kind": "arista_ceos",
+      "image": "ceos:4.32.0F",
+      "mgmt-net": "",
+      "mgmt-intf": "Management0",
+      "mgmt-ipv4-address": "172.20.20.4",
+      "mgmt-ipv4-prefix-length": 24,
+      "mgmt-ipv6-address": "3fff:172:20:20::4",
+      "mgmt-ipv6-prefix-length": 64,
+      "mac-address": "00:1c:73:bb:ef:c9",
+      "labels": {
+        "clab-mgmt-net-bridge": "br-0205d9a0c3cd",
+        "clab-node-group": "",
+        "clab-node-kind": "arista_ceos",
+        "clab-node-lab-dir": "/home/lorenzo/ospf-mgmt-app/test/test2/clab-test/C",
+        "clab-node-longname": "clab-test-C",
+        "clab-node-name": "C",
+        "clab-node-type": "",
+        "clab-owner": "lorenzo",
+        "clab-topo-file": "/home/lorenzo/ospf-mgmt-app/test/test2/topology.clab.yaml",
+        "containerlab": "test"
+      },
+      "port-bindings": [
+      ]
+    },
+    "ISP": {
+      "index": "3",
+      "shortname": "ISP",
+      "longname": "clab-test-ISP",
+      "fqdn": "ISP.test.io",
+      "group": "",
+      "labdir": "/home/lorenzo/ospf-mgmt-app/test/test2/clab-test/ISP",
+      "kind": "arista_ceos",
+      "image": "ceos:4.32.0F",
+      "mgmt-net": "",
+      "mgmt-intf": "Management0",
+      "mgmt-ipv4-address": "172.20.20.3",
+      "mgmt-ipv4-prefix-length": 24,
+      "mgmt-ipv6-address": "3fff:172:20:20::3",
+      "mgmt-ipv6-prefix-length": 64,
+      "mac-address": "00:1c:73:0f:9c:87",
+      "labels": {
+        "clab-mgmt-net-bridge": "br-0205d9a0c3cd",
+        "clab-node-group": "",
+        "clab-node-kind": "arista_ceos",
+        "clab-node-lab-dir": "/home/lorenzo/ospf-mgmt-app/test/test2/clab-test/ISP",
+        "clab-node-longname": "clab-test-ISP",
+        "clab-node-name": "ISP",
+        "clab-node-type": "",
+        "clab-owner": "lorenzo",
+        "clab-topo-file": "/home/lorenzo/ospf-mgmt-app/test/test2/topology.clab.yaml",
+        "containerlab": "test"
+      },
+      "port-bindings": [
+      ]
+    }
+  },
+  "links": [
+    {
+      "a": {
+        "node": "A",
+        "interface": "eth1",
+        "mac": "aa:c1:ab:a1:41:26",
+        "peer": "z"
+      },
+      "z": {
+        "node": "B",
+        "interface": "eth2",
+        "mac": "aa:c1:ab:2a:48:f1",
+        "peer": "a"
+      }
+    },
+    {
+      "a": {
+        "node": "B",
+        "interface": "eth1",
+        "mac": "aa:c1:ab:60:63:c6",
+        "peer": "z"
+      },
+      "z": {
+        "node": "C",
+        "interface": "eth1",
+        "mac": "aa:c1:ab:35:f0:0f",
+        "peer": "a"
+      }
+    },
+    {
+      "a": {
+        "node": "A",
+        "interface": "eth2",
+        "mac": "aa:c1:ab:aa:10:93",
+        "peer": "z"
+      },
+      "z": {
+        "node": "C",
+        "interface": "eth2",
+        "mac": "aa:c1:ab:4c:db:22",
+        "peer": "a"
+      }
+    },
+    {
+      "a": {
+        "node": "A",
+        "interface": "eth3",
+        "mac": "aa:c1:ab:be:38:5e",
+        "peer": "z"
+      },
+      "z": {
+        "node": "ISP",
+        "interface": "eth1",
+        "mac": "aa:c1:ab:3d:29:c1",
+        "peer": "a"
+      }
+    },
+    {
+      "a": {
+        "node": "B",
+        "interface": "eth3",
+        "mac": "aa:c1:ab:49:94:86",
+        "peer": "z"
+      },
+      "z": {
+        "node": "host",
+        "interface": "veth-host",
+        "mac": "aa:c1:ab:f8:ce:82",
+        "peer": "a"
+      }
+    }
+  ]
+}

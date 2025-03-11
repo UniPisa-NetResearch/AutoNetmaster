@@ -1,0 +1,33 @@
+! Startup-config last modified at Tue Mar 11 10:14:37 2025 by root
+! device: ISP (cEOSLab, EOS-4.32.0F-36401836.4320F (engineering build))
+!
+no aaa root
+!
+username admin privilege 15 role network-admin secret sha512 $6$fU4VRc0Vmx.oFTo7$9QB2ZIp7LiqyJkEBE5C7w0NDZYPGVWPHru5krkg9B4hBbTfLPnaDeC1wlZ1DHibmYYuPOdVUO23fd7CYKQCx7.
+!
+transceiver qsfp default-mode 4x10G
+!
+service routing protocols model multi-agent
+!
+hostname ISP
+!
+spanning-tree mode mstp
+!
+system l1
+   unsupported speed action error
+   unsupported error-correction action error
+!
+management api http-commands
+   no shutdown
+!
+interface Ethernet1
+   no switchport
+   ip address 209.165.201.30/30
+!
+interface Management0
+   ip address 172.20.20.3/24
+   ipv6 address 3fff:172:20:20::3/64
+!
+ip routing
+!
+end
