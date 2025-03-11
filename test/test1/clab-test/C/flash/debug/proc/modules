@@ -62,7 +62,7 @@ intel_rapl_common 53248 1 intel_rapl_msr, Live 0xffffffffc0a86000
 snd_acp_legacy_mach 24576 0 - Live 0xffffffffc2a11000
 snd_acp_mach 45056 1 snd_acp_legacy_mach, Live 0xffffffffc29ff000
 snd_soc_nau8821 61440 1 snd_acp_mach, Live 0xffffffffc29e6000
-amdgpu 19992576 64 - Live 0xffffffffc14c3000
+amdgpu 19992576 73 - Live 0xffffffffc14c3000
 snd_soc_dmic 12288 1 - Live 0xffffffffc14b9000
 snd_acp3x_rn 12288 4 - Live 0xffffffffc14af000
 snd_acp3x_pdm_dma 12288 1 - Live 0xffffffffc14a5000
