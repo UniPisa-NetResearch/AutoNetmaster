@@ -16,10 +16,10 @@ from lsa_3.summary_lsa import *
 from lsa_4.asbr_summary_lsa import *
 from lsa_5.external_lsa import *
 from utilities import *
+from gui.gui import app
 
 def run_flask():
-    from gui.gui import app
-    app.run(debug=True, use_reloader=False)
+    app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)
 
 if len(sys.argv) < 2:
     sys.stderr.write('ERRORE: nodo target non fornito in input\n')
@@ -225,18 +225,21 @@ while True:
             print(network_topology)
 
         elif cmd == "display":
+            network_routers_json = {router_id: json.loads(router.toJSON()) for router_id, router in network_routers.items()}
+            enc_data = network_topology.toJSON()
+
             flask_thread = Thread(target=run_flask, daemon=True)
             flask_thread.start()
 
-            network_routers_json = {router_id: json.loads(router.toJSON()) for router_id, router in network_routers.items()}
-            enc_data = quote(network_topology.toJSON())
-            enc_data += "&network_routers=" + quote(str(network_routers_json))
-            enc_data += "&target=" + quote(str(input_node))
-
-            url = f"http://127.0.0.1:5000/?data={enc_data}"
-
-            time.sleep(2)
-            webbrowser.open(url)
+            app.config['NETWORK_ROUTERS_JSON'] = network_routers_json
+            app.config['ENC_DATA'] = enc_data
+            app.config['TARGET'] = input_node
+            
+            print(network_routers_json)
+            print(enc_data)
+            print(input_node)
+            
+            webbrowser.open("http://127.0.0.1:5000/")
 
         elif cmd == "help":
             print("""

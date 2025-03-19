@@ -135,12 +135,8 @@
                 if (endpoints.length === 1){
                     let new_node;
 
-                    if (isIpInNetwork(networkTarget, link.id + "/" + find_subnet_length(link.mask))) {
-                        new_node = 'Host'
-                    } else {
-                        new_node = 'PC' + pcCounter;
-                        pcCounter++;
-                    }
+                    new_node = 'PC' + pcCounter;
+                    pcCounter++;
 
                     nodes.push({
                         id: new_node, 

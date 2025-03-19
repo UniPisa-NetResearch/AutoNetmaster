@@ -22,6 +22,21 @@ topology:
       kind: arista_ceos
       image: ceos:4.32.0F
       startup-config: configs/isp.cfg
+    H1:
+      kind: linux
+      image: alpine:latest
+      binds:
+        - /ospf-mgmt-app
+    H2:
+      kind: linux
+      image: alpine:latest
+      binds:
+        - /ospf-mgmt-app
+    H3:
+      kind: linux
+      image: alpine:latest
+      binds:
+        - /ospf-mgmt-app
     SW:
       kind: bridge
   links:
@@ -30,4 +45,8 @@ topology:
     - endpoints: ["ASBR:eth1", "SW:eth3"]
     - endpoints: ["A:eth2", "C:eth1"]
     - endpoints: ["B:eth2", "C:eth2"]
-    - endpoints: ["ASBR:eth2", "ISP:eth1"]
+    - endpoints: ["ASBR:eth2", "ISP:eth1"]   
+    - endpoints: ["A:eth3", "H1:eth1"]
+    - endpoints: ["B:eth3", "H2:eth1"]
+    - endpoints: ["C:eth3", "H3:eth1"]
+

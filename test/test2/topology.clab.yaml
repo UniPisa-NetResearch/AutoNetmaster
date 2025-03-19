@@ -23,3 +23,4 @@ topology:
     - endpoints: ["B:eth1", "C:eth1"]
     - endpoints: ["A:eth2", "C:eth2"]
     - endpoints: ["A:eth3", "ISP:eth1"]
+    - endpoints: ["A:eth4", "host:veth-host"]
