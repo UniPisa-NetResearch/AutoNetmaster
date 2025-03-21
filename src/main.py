@@ -228,18 +228,12 @@ while True:
             network_routers_json = {router_id: json.loads(router.toJSON()) for router_id, router in network_routers.items()}
             enc_data = network_topology.toJSON()
 
-            flask_thread = Thread(target=run_flask, daemon=True)
-            flask_thread.start()
-
             app.config['NETWORK_ROUTERS_JSON'] = network_routers_json
             app.config['ENC_DATA'] = enc_data
             app.config['TARGET'] = input_node
-            
-            print(network_routers_json)
-            print(enc_data)
-            print(input_node)
-            
-            webbrowser.open("http://127.0.0.1:5000/")
+
+            flask_thread = Thread(target=run_flask, daemon=True)
+            flask_thread.start()
 
         elif cmd == "help":
             print("""
