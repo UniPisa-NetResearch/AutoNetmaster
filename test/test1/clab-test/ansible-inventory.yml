@@ -12,16 +12,24 @@ all:
         ansible_password: admin
       hosts:
         clab-test-A:
-          ansible_host: 172.20.20.6
+          ansible_host: 172.20.20.8
         clab-test-ASBR:
-          ansible_host: 172.20.20.4
+          ansible_host: 172.20.20.6
         clab-test-B:
           ansible_host: 172.20.20.3
         clab-test-C:
-          ansible_host: 172.20.20.2
+          ansible_host: 172.20.20.9
         clab-test-ISP:
           ansible_host: 172.20.20.5
     bridge:
       hosts:
         clab-test-SW:
           ansible_host: 
+    linux:
+      hosts:
+        clab-test-H1:
+          ansible_host: 172.20.20.4
+        clab-test-H2:
+          ansible_host: 172.20.20.7
+        clab-test-H3:
+          ansible_host: 172.20.20.2

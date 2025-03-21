@@ -146,14 +146,32 @@
                         size: 30
                     });
 
+                    let switchId = "switch_" + link.id;
+                    nodes.push({
+                        id: switchId, 
+                        label: "Switch " + subnetLabel,
+                        image: switchImage,
+                        shape: 'image',
+                        size: 30
+                    });
+                    
                     edges.push({
-                        from: new_node,
-                        to: endpoints[0],
-                        label: link.id + " / " + find_subnet_length(link.mask),
-                        title:link.id,
+                        from: new_node, 
+                        to: switchId, 
+                        label: subnetLabel, 
+                        title: link.id,
                         arrows: 'none',
                         color: { color: areaColor }
-                    })
+                    });
+                    
+                    edges.push({
+                        from: switchId, 
+                        to: endpoints[0], 
+                        label: subnetLabel, 
+                        title: link.id,
+                        arrows: 'none',
+                        color: { color: areaColor }
+                    });
                 }
                 
                 else if (endpoints.length >= 3) {
