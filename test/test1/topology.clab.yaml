@@ -26,17 +26,17 @@ topology:
       kind: linux
       image: pc_635766
       binds:
-        - /ospf-mgmt-app
+        - /ospf-mgmt-app:/ospf-mgmt-app
     H2:
       kind: linux
       image: pc_635766
       binds:
-        - /ospf-mgmt-app
+        - /ospf-mgmt-app:/ospf-mgmt-app
     H3:
       kind: linux
       image: pc_635766
       binds:
-        - /ospf-mgmt-app
+        - /ospf-mgmt-app:/ospf-mgmt-app
     SW:
       kind: bridge
   links:

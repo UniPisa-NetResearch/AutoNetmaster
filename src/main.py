@@ -6,6 +6,7 @@ from threading import Thread
 from queue import Queue
 from urllib.parse import quote
 
+from hostname.get_hostname import *
 from protocol.protocol_info import *
 from interfaces.get_interfaces import *
 from neighbors.get_neighbors import *
@@ -37,7 +38,7 @@ target_node = pyeapi.client.connect(
     return_node=True
 )
 
-hostname = (target_node.enable('show hostname'))[0]['result']['hostname']
+hostname = get_hostname(target_node)
 
 interfaces = get_interfaces(target_node)
 
@@ -90,23 +91,25 @@ for area_data in router_lsa_1:
     network_topology.add_area(new_area)
 
 # recupero LSA tipo 2
-
 network_lsa_2 = get_network_lsa_info(target_node)
 
-for area_data in network_lsa_2:
-    for target_area in network_topology.areas:
-        for area_db_entry in network_lsa_2[area_data]['areaDatabase']:
-            for lsa_entry in area_db_entry['areaLsas']:
-                link_state_id = lsa_entry['linkStateId']
-                network_mask = lsa_entry['ospfNetworkLsa']['networkMask']
-                dr = lsa_entry['advertisingRouter']
-                attached_routers = lsa_entry['ospfNetworkLsa']['attachedRouters']
-                bdr = attached_routers[1] if len(attached_routers) > 1 else None
+for area_id, area_info in network_lsa_2.items():
+    target_area = network_topology.find_target_area(area_data)
+    if not target_area:
+        continue
 
-                for link in target_area.links:
-                    if link.id == link_state_id:
-                        link.set_mask(network_mask)
-                        link.set_dr_bdr(dr, bdr)
+    for area_db_entry in area_info['areaDatabase']:
+        for lsa_entry in area_db_entry['areaLsas']:
+            link_state_id = lsa_entry['linkStateId']
+            network_mask = lsa_entry['ospfNetworkLsa']['networkMask']
+            dr = lsa_entry['advertisingRouter']
+            attached_routers = lsa_entry['ospfNetworkLsa']['attachedRouters']
+            bdr = attached_routers[1] if len(attached_routers) > 1 else None
+
+            link = next((l for l in target_area.links if l.id == link_state_id), None)
+            if link:
+                link.set_mask(network_mask)
+                link.set_dr_bdr(dr, bdr)
 
 # recupero LSA tipo 3
 
@@ -114,7 +117,6 @@ summary_lsa_3 = get_summary_lsa_info(target_node)
 
 for area_data in summary_lsa_3:
     target_area = network_topology.find_target_area(area_data)
-
     if not target_area:
         continue
     
@@ -165,6 +167,8 @@ for external_data in external_lsa_5:
         
         network_topology.add_external_network(route)
 
+# discover other nodes
+
 def discover_router(ip_addr):
     """Connette al router dato l'IP e ne estrae le informazioni."""
     node = pyeapi.client.connect(
@@ -192,13 +196,13 @@ queue.put(router)
 
 while not queue.empty():
     current_router = queue.get()
-    neighbors_dict = {n["router_id"]: n for n in current_router.neighbors}
+    #neighbors_dict = {n["router_id"]: n for n in current_router.neighbors}
 
     for nghb in current_router.neighbors:
         nghb_id = nghb['router_id']
         nghb_ip = nghb['neighbor_ip_addr']
 
-        if nghb_id not in network_routers and nghb_id != router.router_id:
+        if nghb_id not in network_routers: # and nghb_id != router.router_id:
             new_router, new_neighbors = discover_router(nghb_ip)
             network_routers[nghb_id] = new_router
             queue.put(new_router)

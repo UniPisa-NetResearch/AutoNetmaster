@@ -109,7 +109,8 @@ class Area:
         }
 
 class Node:
-    def __init__(self, router_id, hostname, interface_list=None, neighbor_list=None, route_table=None):
+    def __init__(self, router_id, hostname, interface_list=None, 
+                 neighbor_list=None, route_table=None):
         self.hostname = hostname
         self.router_id = router_id
         self.interfaces = interface_list if interface_list else []
@@ -125,7 +126,8 @@ class Node:
             "line_protocol_status": line_protocol_status
         })
 
-    def add_neighbor(self, interface_id, neighbor_router_id, neighbor_ip_addr, adjacency_state, designated_router, backup_designated_router):
+    def add_neighbor(self, interface_id, neighbor_router_id, neighbor_ip_addr, 
+                     adjacency_state, designated_router, backup_designated_router):
         self.neighbors.append({
             "interface_id": interface_id,
             "router_id": neighbor_router_id,
@@ -178,7 +180,8 @@ class Node:
 
 
 class Link:
-    def __init__(self, id, type, options, metric, mask=None, endpoints=None, dr=None, bdr=None):
+    def __init__(self, id, type, options, metric, mask=None, 
+                 endpoints=None, dr=None, bdr=None):
         self.id = id
         self.type = type
         self.options = options

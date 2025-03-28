@@ -60,6 +60,7 @@
         let monitorImage = '../static/images/monitor.png';
 
         let pcCounter = 0;
+        let swCounter = 0;
         
         networkData.areas.forEach(function(area, index) {
             const areaColor = colors[index % colors.length];
@@ -124,7 +125,7 @@
                         label: node, 
                         image: routerImage,
                         shape: 'image',    
-                        size: 30
+                        size: 40
                     });
                 }
             });
@@ -137,28 +138,29 @@
 
                     new_node = 'PC' + pcCounter;
                     pcCounter++;
+                    swCounter++;
 
                     nodes.push({
                         id: new_node, 
                         label: new_node,
                         image: monitorImage,
                         shape: 'image',
-                        size: 30
+                        size: 40
                     });
 
                     let switchId = "switch_" + link.id;
                     nodes.push({
                         id: switchId, 
-                        label: "Switch " + subnetLabel,
+                        label: "SW" + swCounter,
                         image: switchImage,
                         shape: 'image',
-                        size: 30
+                        size: 40
                     });
                     
                     edges.push({
                         from: new_node, 
                         to: switchId, 
-                        label: subnetLabel, 
+                        label: link.id + " / " + find_subnet_length(link.mask), 
                         title: link.id,
                         arrows: 'none',
                         color: { color: areaColor }
@@ -167,7 +169,7 @@
                     edges.push({
                         from: switchId, 
                         to: endpoints[0], 
-                        label: subnetLabel, 
+                        label: link.id + " / " + find_subnet_length(link.mask), 
                         title: link.id,
                         arrows: 'none',
                         color: { color: areaColor }
@@ -176,14 +178,15 @@
                 
                 else if (endpoints.length >= 3) {
                     let switchId = "switch_" + link.id;
+                    swCounter++;
                     
                     if (!nodes.some(n => n.id === switchId)) {
                         nodes.push({
                             id: switchId, 
-                            label: "Switch " + link.id + " / " + find_subnet_length(link.mask),
+                            label: "SW" + swCounter,
                             image: switchImage,
                             shape: 'image',
-                            size: 30
+                            size: 40
                         });
                     }
 
@@ -231,12 +234,12 @@
         let options = {
             nodes: {
                 shape: 'image',
-                size: 30,
-                font: { size: 14 }
+                size: 40,
+                font: { size: 21 }
             },
             edges: {
                 smooth: false,
-                font: { size: 10, align: 'top' }
+                font: { size: 17, align: 'top' }
             },
             layout: {
                 randomSeed: 2
