@@ -6,7 +6,7 @@ app = Flask(__name__)
 @app.route('/')
 def index():
     target = app.config.get('TARGET')
-    data = app.config.get('ENC_DATA')
+    data = app.config.get('DATA')
     network_routers = app.config.get('NETWORK_ROUTERS_JSON')
 
     return render_template('index.html', target=target, data=data, network_routers=network_routers)

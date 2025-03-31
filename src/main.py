@@ -93,23 +93,20 @@ for area_data in router_lsa_1:
 # recupero LSA tipo 2
 network_lsa_2 = get_network_lsa_info(target_node)
 
-for area_id, area_info in network_lsa_2.items():
-    target_area = network_topology.find_target_area(area_data)
-    if not target_area:
-        continue
+for area_data in network_lsa_2:
+    for target_area in network_topology.areas:
+        for area_db_entry in network_lsa_2[area_data]['areaDatabase']:
+            for lsa_entry in area_db_entry['areaLsas']:
+                link_state_id = lsa_entry['linkStateId']
+                network_mask = lsa_entry['ospfNetworkLsa']['networkMask']
+                dr = lsa_entry['advertisingRouter']
+                attached_routers = lsa_entry['ospfNetworkLsa']['attachedRouters']
+                bdr = attached_routers[1] if len(attached_routers) > 1 else None
 
-    for area_db_entry in area_info['areaDatabase']:
-        for lsa_entry in area_db_entry['areaLsas']:
-            link_state_id = lsa_entry['linkStateId']
-            network_mask = lsa_entry['ospfNetworkLsa']['networkMask']
-            dr = lsa_entry['advertisingRouter']
-            attached_routers = lsa_entry['ospfNetworkLsa']['attachedRouters']
-            bdr = attached_routers[1] if len(attached_routers) > 1 else None
-
-            link = next((l for l in target_area.links if l.id == link_state_id), None)
-            if link:
-                link.set_mask(network_mask)
-                link.set_dr_bdr(dr, bdr)
+                for link in target_area.links:
+                    if link.id == link_state_id:
+                        link.set_mask(network_mask)
+                        link.set_dr_bdr(dr, bdr)
 
 # recupero LSA tipo 3
 
@@ -230,10 +227,10 @@ while True:
 
         elif cmd == "display":
             network_routers_json = {router_id: json.loads(router.toJSON()) for router_id, router in network_routers.items()}
-            enc_data = network_topology.toJSON()
+            data = network_topology.toJSON()
 
             app.config['NETWORK_ROUTERS_JSON'] = network_routers_json
-            app.config['ENC_DATA'] = enc_data
+            app.config['DATA'] = data
             app.config['TARGET'] = input_node
 
             flask_thread = Thread(target=run_flask, daemon=True)

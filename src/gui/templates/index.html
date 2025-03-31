@@ -38,9 +38,6 @@
         let networkRouters = {{ network_routers|safe }};
         console.log(networkRouters);
 
-        let networkTarget = '{{ target|safe }}';
-        console.log(networkTarget);
-
         const colors = [
             "#0000FF",
             "#FF0000",
@@ -52,12 +49,12 @@
             "#800080" 
         ];
 
-        let nodes = [];
-        let edges = [];
-
         let routerImage = '../static/images/router.png';
         let switchImage = '../static/images/switch.png';
         let monitorImage = '../static/images/monitor.png';
+
+        let nodes = [];
+        let edges = [];
 
         let pcCounter = 0;
         let swCounter = 0;
