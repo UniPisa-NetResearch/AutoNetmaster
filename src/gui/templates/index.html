@@ -112,7 +112,6 @@
                     infoDiv.innerHTML += "<p>Nessun percorso verso ASBR</p>";
                 }
             });
-        
             legendDiv.appendChild(areaLegend);
 
             area.nodes.forEach(function(node) {
@@ -120,9 +119,7 @@
                     nodes.push({
                         id: node, 
                         label: node, 
-                        image: routerImage,
-                        shape: 'image',    
-                        size: 40
+                        image: routerImage
                     });
                 }
             });
@@ -135,24 +132,21 @@
 
                     new_node = 'PC' + pcCounter;
                     pcCounter++;
-                    swCounter++;
 
                     nodes.push({
                         id: new_node, 
                         label: new_node,
-                        image: monitorImage,
-                        shape: 'image',
-                        size: 40
+                        image: monitorImage
                     });
 
                     let switchId = "switch_" + link.id;
                     nodes.push({
                         id: switchId, 
                         label: "SW" + swCounter,
-                        image: switchImage,
-                        shape: 'image',
-                        size: 40
+                        image: switchImage
                     });
+
+                    swCounter++;
                     
                     edges.push({
                         from: new_node, 
@@ -175,17 +169,16 @@
                 
                 else if (endpoints.length >= 3) {
                     let switchId = "switch_" + link.id;
-                    swCounter++;
                     
                     if (!nodes.some(n => n.id === switchId)) {
                         nodes.push({
                             id: switchId, 
                             label: "SW" + swCounter,
-                            image: switchImage,
-                            shape: 'image',
-                            size: 40
+                            image: switchImage
                         });
                     }
+
+                    swCounter++;
 
                     for (let i = 0; i < endpoints.length; i++) {
                         edges.push({
@@ -193,6 +186,7 @@
                             to: endpoints[i],
                             label: link.id + " / " + find_subnet_length(link.mask),
                             title: link.id,
+                            arrows: 'none',
                             color: { color: areaColor }
                         });
                     }
@@ -262,12 +256,7 @@
         
         network.on("blurEdge", () => { container.style.cursor = "default"; });
 
-        function updateInfo(inner) {
-            let infoDiv = document.getElementById('info')
-            infoDiv.innerHTML = inner;
-        }
-
-        network.on("click", function (params) {
+        network.on("click", (params) => {
             if (params.edges.length > 0 && params.nodes.length === 0) {
                 let edgeId = params.edges[0];
 
@@ -301,7 +290,7 @@
 
                 let node = networkRouters[targetNode.id];
 
-                if(node === null){
+                if(node === undefined){
                     console.warn("I nodi non router non possono essere selezionati");
                     return;
                 }
@@ -364,20 +353,6 @@
             }
 
             return bitCount;
-        }
-
-        function ipToBinary(ip) {
-            return ip.split('.').map(octet => parseInt(octet, 10).toString(2).padStart(8, '0')).join('');
-        }
-        
-        function isIpInNetwork(ip, network) {
-            const [networkIp, mask] = network.split('/');
-            const maskBits = parseInt(mask, 10);
-            
-            const ipBinary = ipToBinary(ip);
-            const networkBinary = ipToBinary(networkIp);
-            
-            return ipBinary.substring(0, maskBits) === networkBinary.substring(0, maskBits);
         }
     </script>
 </body>
