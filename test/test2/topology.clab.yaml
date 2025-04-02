@@ -18,9 +18,26 @@ topology:
       kind: arista_ceos
       image: ceos:4.32.0F
       startup-config: configs/isp.cfg
+    H1:
+      kind: linux
+      image: pc_635766
+      binds:
+        - /ospf-mgmt-app:/ospf-mgmt-app
+    H2:
+      kind: linux
+      image: pc_635766
+      binds:
+        - /ospf-mgmt-app:/ospf-mgmt-app
+    H3:
+      kind: linux
+      image: pc_635766
+      binds:
+        - /ospf-mgmt-app:/ospf-mgmt-app
   links:
     - endpoints: ["A:eth1", "B:eth2"]
     - endpoints: ["B:eth1", "C:eth1"]
     - endpoints: ["A:eth2", "C:eth2"]
     - endpoints: ["A:eth3", "ISP:eth1"]
-    - endpoints: ["A:eth4", "host:veth-host"]
+    - endpoints: ["A:eth4", "H1:eth1"]
+    - endpoints: ["B:eth3", "H2:eth1"]
+    - endpoints: ["C:eth3", "H3:eth1"]
