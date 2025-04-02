@@ -1,22 +1,12 @@
 OSPF management software application
 
 
-L'obiettivo dell'applicazione è ricostruire la topologia di una data rete usando le informazioni contenute all'interno id uno specifico router della suddetta rete, in particolare il database ospf.
+L'obiettivo dell'applicazione e' ricostruire la topologia di una data rete usando le informazioni contenute all'interno id uno specifico router della suddetta rete, in particolare il database ospf.
 
-
-(!!!) 
-Per testare l'applicazione è necessario definire un link virtuale tra l'host su cui la rete è emulata la rete grazie a CONTAINERlab e il router il cui database ospf sarà usato per ricostruire la rete. E' quindi necessario aggiornare le tabelle di routing della macchina host e del router interessato (sul router interessato è necessario attivare anche ospf).
-(Queste procedure sono automatizzata nello script run_ospf_mgmt.sh: una volta selezionato il nodo della rete di interesse basterà specificare l'indirizzo ip e la maschera della sotto rete a cui appartiene il link virtuale tra l'host e il nodo target)
-
-host route table update:
-sudo ip addr add "$ip"/"$mask" dev veth-host
-sudo ip route add "$net_ip"/"$net_mask" via "$gateaway"
-
-E' infine necessario creare manualmente un bridge, poiché CONTAINERlab non supporta nativamente gli switch e l'utilizzo di nodi per la loro emulazione sarebbe prestazionalmente costoso ed inoltre inutile allo scapo di questo applicativo software.
-
-bridge manual creation:
+E' necessario creare manualmente un bridge, poiche' CONTAINERlab non supporta nativamente gli switch e l'utilizzo di nodi per la loro emulazione sarebbe prestazionalmente costoso bridge manual creation:
 > sudo ip link add SW type bridge
 > sudo ip link set SW up
 > ip link show SW
 
-
+L'applicazione gira in tutti i sistemi linux, a patto che sia installato l'emulatore di rete CONTAINERlab e siano contenute delle immagini di nodi ARISTA.
+Qualora un utente voglia testare l'applicazione deve inoltre impostare il percorso nell'attributo bind nel file di definizione della topologia
