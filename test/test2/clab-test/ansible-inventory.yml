@@ -18,12 +18,12 @@ all:
         clab-test-C:
           ansible_host: 172.20.20.5
         clab-test-ISP:
-          ansible_host: 172.20.20.7
+          ansible_host: 172.20.20.3
     linux:
       hosts:
         clab-test-H1:
-          ansible_host: 172.20.20.3
+          ansible_host: 172.20.20.2
         clab-test-H2:
           ansible_host: 172.20.20.8
         clab-test-H3:
-          ansible_host: 172.20.20.2
+          ansible_host: 172.20.20.7
