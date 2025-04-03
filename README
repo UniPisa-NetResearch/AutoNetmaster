@@ -8,6 +8,7 @@ E' necessario creare manualmente un bridge, poiche' CONTAINERlab non supporta na
 > sudo ip link set SW up
 > ip link show SW
 
-L'applicazione gira in tutti i sistemi linux, a patto che sia installato l'emulatore di rete CONTAINERlab e siano contenute delle immagini di nodi ARISTA.
+L'applicazione gira in tutti i sistemi linux, a patto che sia installato l'emulatore di rete CONTAINERlab e siano contenute delle immagini di nodi ARISTA 
+(nei test e' utilizzato ceos:4.32.0F).
 Qualora un utente voglia testare l'applicazione deve inoltre impostare il percorso nell'attributo bind nel file di definizione della topologia.
 Inoltre la cartella test (39MB) e' inutile ai fini del funzionamento dell'applicazione: conviene tagliarla e incollarla altrove, in modo tale da non passarla agli host con bind.
