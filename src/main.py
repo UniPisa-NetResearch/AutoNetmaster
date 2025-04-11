@@ -168,6 +168,7 @@ for external_data in external_lsa_5:
 
 def discover_router(ip_addr):
     """Connette al router dato l'IP e ne estrae le informazioni."""
+    print(ip_addr)
     node = pyeapi.client.connect(
         transport='https',
         host=ip_addr,
