@@ -1,52 +1,52 @@
-name: test
+name: test1
 
 topology:
   nodes:
     A:
       kind: arista_ceos
-      image: ceos:4.32.0F
-      startup-config: configs/ra.cfg
+      image: ceos:4.34.0F
+      #startup-config: configs/ra.cfg
     B:
       kind: arista_ceos
-      image: ceos:4.32.0F
-      startup-config: configs/rb.cfg
+      image: ceos:4.34.0F
+      #startup-config: configs/rb.cfg
     C:
       kind: arista_ceos
-      image: ceos:4.32.0F
-      startup-config: configs/rc.cfg
+      image: ceos:4.34.0F
+      #startup-config: configs/rc.cfg
     ASBR:
       kind: arista_ceos
-      image: ceos:4.32.0F
-      startup-config: configs/asbr.cfg
+      image: ceos:4.34.0F
+      #startup-config: configs/asbr.cfg
     ISP:
       kind: arista_ceos
-      image: ceos:4.32.0F
-      startup-config: configs/isp.cfg
+      image: ceos:4.34.0F
+      #startup-config: configs/isp.cfg
     H1:
       kind: linux
-      image: pc_635766
+      image: alpine:latest
       binds:
-        - /ospf-mgmt-app:/ospf-mgmt-app
+        - /home/daniele/AutoNetMaster:/AutoNetMaster
     H2:
       kind: linux
-      image: pc_635766
+      image: alpine:latest
       binds:
-        - /ospf-mgmt-app:/ospf-mgmt-app
+        - /home/daniele/AutoNetMaster:/AutoNetMaster
     H3:
       kind: linux
-      image: pc_635766
+      image: alpine:latest
       binds:
-        - /ospf-mgmt-app:/ospf-mgmt-app
+        - /home/daniele/AutoNetMaster:/AutoNetMaster
     SW:
       kind: bridge
+    
   links:
-    - endpoints: ["A:eth1", "SW:eth1"]
-    - endpoints: ["B:eth1", "SW:eth2"]
-    - endpoints: ["ASBR:eth1", "SW:eth3"]
-    - endpoints: ["A:eth2", "C:eth1"]
-    - endpoints: ["B:eth2", "C:eth2"]
-    - endpoints: ["ASBR:eth2", "ISP:eth1"]   
-    - endpoints: ["A:eth3", "H1:eth1"]
-    - endpoints: ["B:eth3", "H2:eth1"]
-    - endpoints: ["C:eth3", "H3:eth1"]
-
+    - endpoints: ["A:eth1","SW:eth1"]
+    - endpoints: ["B:eth1","SW:eth2"]
+    - endpoints: ["ASBR:eth1","SW:eth3"]
+    - endpoints: ["A:eth2","C:eth1"]
+    - endpoints: ["B:eth2","C:eth2"]
+    - endpoints: ["ASBR:eth2","ISP:eth1"]
+    - endpoints: ["A:eth3","H1:eth1"]
+    - endpoints: ["B:eth3","H2:eth1"]
+    - endpoints: ["C:eth3","H3:eth1"]
