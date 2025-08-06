@@ -5,23 +5,23 @@ topology:
     A:
       kind: arista_ceos
       image: ceos:4.34.0F
-      #startup-config: configs/ra.cfg
+      startup-config: configs/ra.cfg
     B:
       kind: arista_ceos
       image: ceos:4.34.0F
-      #startup-config: configs/rb.cfg
+      startup-config: configs/rb.cfg
     C:
       kind: arista_ceos
       image: ceos:4.34.0F
-      #startup-config: configs/rc.cfg
+      startup-config: configs/rc.cfg
     ASBR:
       kind: arista_ceos
       image: ceos:4.34.0F
-      #startup-config: configs/asbr.cfg
+      startup-config: configs/asbr.cfg
     ISP:
       kind: arista_ceos
       image: ceos:4.34.0F
-      #startup-config: configs/isp.cfg
+      startup-config: configs/isp.cfg
     H1:
       kind: linux
       image: alpine:latest
