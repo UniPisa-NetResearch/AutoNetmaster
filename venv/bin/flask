@@ -1,4 +1,4 @@
-#!/home/lorenzo/ospf-mgmt-app/venv/bin/python3
+#!/home/daniele/AutoNetMaster/AutoNetmaster/venv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys
