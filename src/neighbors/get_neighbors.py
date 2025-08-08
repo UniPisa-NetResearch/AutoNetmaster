@@ -11,7 +11,6 @@ def get_neighbors(target_node):
         neighbor_info = {
             "router_id": neighbor['routerId'],
             "interface": neighbor['interfaceName'],
-            #"neighbor_ip_addr": neighbor['interfaceAddress'],
             "adjacency_state": neighbor['adjacencyState'],
             "designated_router": neighbor['designatedRouter'],
             "backup_designated_router": neighbor['backupDesignatedRouter'],
