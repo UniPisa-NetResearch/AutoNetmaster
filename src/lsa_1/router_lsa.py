@@ -1,21 +1,25 @@
 import pyeapi
 import json
-from areas.get_areas import get_areas
 
 def get_router_lsa_info(target_node):
-    
-    node_areas= get_areas(target_node)
 
-    command = "show ospfv3 database area "
-    lsa_1_list=[]
+    command= "show ipv6 ospf database detail"
 
-    for a in node_areas:
-        output = target_node.enable(command+str(a))
-        
-        lsa_area_target= output[0]['result']['vrfs']['default']['addressFamily']['ipv6']['ospf3AreaEntries'][str(a)]['ospf3AreaLsaList']
+    output=target_node.enable(command)
 
-        for lsa in  lsa_area_target:
-            if lsa['lsaType'] == "routerLsa":
-                lsa_1_list.append(lsa)
+    area_entries= output[0]["result"]["vrfs"]["default"]["instList"]["10"]["ospf3AreaEntries"]
+    lsa_type_1=[]
+    for area_key,area_value in area_entries.items():
+        lsa_type_1_area=[]
+        for lsa_entry in area_value["ospf3AreaLsaList"]:
+            if lsa_entry["lsaType"] == "routerLsa":
+                lsa_type_1_area.append(lsa_entry)
+        if not(lsa_type_1_area == []):
+            lsa_type_1.append({
+                area_key:{
+                    "ospf3AreaLsaList":lsa_type_1_area
+                }
+            })
+    return lsa_type_1
 
-    return lsa_1_list
+
