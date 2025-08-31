@@ -17,9 +17,10 @@ def get_route_table(target_node):
 
         entry_info = {
             'ip': route.split('/')[0],
-            'masklen': route.split('/')[-1],
+            'prefix_len': route.split('/')[-1],
             'vias':vias,
-            'protocol': details['routeType']
+            'protocol': details['routeType'],
+            'metric': details['metric']
         }
         table_entries.append(entry_info)
 

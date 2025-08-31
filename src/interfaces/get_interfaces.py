@@ -14,7 +14,7 @@ def get_interfaces(target_node):
         # inserisco link-local
         addresses.append({
             'address':interface_details["linkLocal"]["address"],
-            'mask': interface_details["linkLocal"]["subnet"].split('/')[-1],
+            'prefix_length': interface_details["linkLocal"]["subnet"].split('/')[-1],
             'active': interface_details["linkLocal"]["active"],
             'type':'link local'
         })
@@ -22,13 +22,13 @@ def get_interfaces(target_node):
         for add in interface_details["addresses"]:
             addresses.append({
                 'address':add["address"],
-                'mask': add["subnet"].split('/')[-1],
+                'prefix_length': add["subnet"].split('/')[-1],
                 'active': add["active"],
                 'type':'config'
             })
 
         interface_info = {
-            'name': interface_name,
+            'id': interface_name,
             'addresses': addresses,
             'interface_status': interface_details['interfaceStatus'],
             'line_protocol_status': interface_details['lineProtocolStatus']

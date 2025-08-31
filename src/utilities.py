@@ -27,8 +27,8 @@ class Network:
         
         topology_str += "\n\nexternal routes:"
         for route in self.external_routes:
-            topology_str += f"\n  - ip: {route.ip}"
-            topology_str += f"\n    - mask: {route.mask}"
+            topology_str += f"\n  - ip: [{route.ip}]"
+            topology_str += f"\n    - prefixlen: {route.masklen}"
             topology_str += f"\n    - via: {route.via}"
             topology_str += f"\n    - metric: {route.metric}"
             topology_str += f"\n    - metric_type: {route.metric_type}"
@@ -72,10 +72,10 @@ class Area:
         topology_str += "\n  links:"
         
         for link in self.links:
-            topology_str += f"\n    - {link.id}:"
+            topology_str += f"\n    - [ {link.id} ]:"
             topology_str += f"\n      - endpoints: {link.endpoints}"
             topology_str += f"\n      - type: {link.type}"
-            topology_str += f"\n      - mask: {getattr(link, 'mask', None)}"
+            topology_str += f"\n      - prefix: {getattr(link, 'prefix', None)}"
             topology_str += f"\n      - dr: {getattr(link, 'dr', None)}"
             topology_str += f"\n      - bdr: {getattr(link, 'bdr', None)}"
             topology_str += f"\n      - metric: {link.metric}"
@@ -83,8 +83,8 @@ class Area:
         topology_str += "\n  ospf inter-area routes:"
         
         for route in self.ospf_inter_area_routes:
-            topology_str += f"\n    - ip: {route.ip}"
-            topology_str += f"\n      - mask: {route.mask}"
+            topology_str += f"\n    - ip: [{route.ip}]"
+            topology_str += f"\n      - masklen: {route.masklen}"
             topology_str += f"\n      - via: {route.via}"
             topology_str += f"\n      - metric: {route.metric}"
 
@@ -117,54 +117,75 @@ class Node:
         self.neighbors = neighbor_list if neighbor_list else []
         self.route_table = route_table if route_table else []
 
-    def add_interface(self, id, ip, masklen, interface_status, line_protocol_status):
+    # devo considerare che per un'interfaccia potrebbero essere più
+    # indirizzi configurati con differente scope
+
+    # quindi invece di considerare ip e maschera considero una lista
+    # di dict del tipo ip, maschera
+    def add_interface(self, id, add, interface_status, line_protocol_status):
         self.interfaces.append({
             "id": id,
-            "ip": ip,
-            "masklen": masklen,
+            "addresses":add,
             "interface_status": interface_status,
             "line_protocol_status": line_protocol_status
         })
 
+    # qua non posso considerare l'indirizzo del vicino
+    # a patto che non si consideri linkLSA per poter vedere
+    # indirizzo link-local
     def add_neighbor(self, interface_id, neighbor_router_id, neighbor_ip_addr, 
                      adjacency_state, designated_router, backup_designated_router):
         self.neighbors.append({
             "interface_id": interface_id,
             "router_id": neighbor_router_id,
-            "neighbor_ip_addr": neighbor_ip_addr,
+            #"neighbor_ip_addr": neighbor_ip_addr,
             "adjacency_state": adjacency_state,
             "designated_router": designated_router,
             "backup_designated_router": backup_designated_router
         })
 
-    def add_route(self, ip, masklen, via, interface, protocol):
-        self.route_table.append({
-            "ip": ip,
-            "masklen": masklen,
-            "via": via,
-            "interface": interface,
-            "protocol": protocol
-        })
+    # la rotta potrebbe avere più vie, quindi via potrebbe essere una lista
+    def add_route(self, ip, masklen, vias, protocol):
+            self.route_table.append({
+                "ip": ip,
+                "prefixLen": masklen,
+                "vias":vias,
+                "protocol": protocol
+            })
 
     def __str__(self):
-        interface_str = "\n        ".join(
-            f"ID: {iface['name']}, ip: {iface['ip']}/{iface['masklen']}, Interface Status: {iface['interface_status']}, Line Protocol Status: {iface['line_protocol_status']}"
-            for iface in self.interfaces
-        )
+        interface_str=""
+        #creare manualmente interface_str, perché devi tenere conto che un'interfaccia ha più indirizzi
+        for iface in self.interfaces:
+            interface_str += f"       ID: {iface['id']},"
+            for ind_int in iface['addresses']:
+                interface_str+=f"\n         address:{ind_int['address']}/{ind_int['prefix_length']}, active:{ind_int['active']}, type:{ind_int['type']}"
+            interface_str+=f"\n         Interface Status: {iface['interface_status']}, Line Protocol Status: {iface['line_protocol_status']}\n"
+            
+        #Neighbor ip address: {n['neighbor_ip_addr']},
         neighbors_str = "\n        ".join(
-            f"Interface: {n['interface']}, Router ID: {n['router_id']}, Neighbor ip address: {n['neighbor_ip_addr']}, "
+            f"Interface: {n['interface']}, Router ID: {n['router_id']}, "
             f"Adj-State: {n['adjacency_state']}, DR: {n['designated_router']}, "
             f"BDR: {n['backup_designated_router']}" for n in self.neighbors
         )
-        route_table_str = "\n        ".join(
-            f"Destination: {route['ip']}/{route['masklen']}, Via: {route['via']}, "
-            f"Interface: {route['interface']}, Protocol: {route['protocol']}"
-            for route in self.route_table
-        )
+        #le vie devono essere stampate per conto proprio, perché potrebbe esserci più di una via
+        #route_table_str = "\n        ".join(
+         #   f"Destination: {route['ip']}/{route['masklen']}"
+          #  f", Via: {route['via']}, Interface: {route['interface']}, Protocol: {route['protocol']}"   
+           # for route in self.route_table
+            #)
+        
+        route_table_str=""
+        for route in self.route_table:
+            route_table_str+=f"Destination: {route['ip']}/{route['prefix_len']}\n          "
+            for v in route['vias']:
+                route_table_str+=f" Via: {v['via']}, Interface: {v['interface']}\n          "   
+            route_table_str+=f" Protocol: {route['protocol']}\n        "
+
         return (
             f"Hostname: {self.hostname}\n"
-            f"Router ID: {self.router_id}\n"
-            f"    Interfaces:\n        {interface_str if self.interfaces else 'None'}\n"
+            f"    Router ID: {self.router_id}\n"
+            f"    Interfaces:\n{interface_str if self.interfaces else 'None'}"
             f"    Neighbors:\n        {neighbors_str if self.neighbors else 'None'}\n"
             f"    Route Table:\n        {route_table_str if self.route_table else 'None'}"
         )
@@ -180,23 +201,28 @@ class Node:
 
 
 class Link:
-    def __init__(self, id, type, options, metric, mask=None, 
+    def __init__(self, id, type, options, metric, prefix=None, 
                  endpoints=None, dr=None, bdr=None):
         self.id = id
         self.type = type
         self.options = options
         self.metric = metric
-        self.endpoints = endpoints
-        self.mask = mask
+        self.endpoints = endpoints if endpoints else []
+        self.prefix = prefix
         self.dr = dr 
         self.bdr = bdr
     
     def add_endpoint(self, endpoint):
-        self.endpoints.append(endpoint)
+        if not(endpoint in self.endpoints):
+            self.endpoints.append(endpoint)
 
-    def set_mask(self, mask):
-        self.mask = mask
-        self.id = and_bit_to_bit(self.id, mask)
+    # per indirizzo da mettere sopra a link nella fase 
+    # di front end uso indirizzo configurato (fd00... oppure 2001:db8...)
+    # non il link local
+    # guardo il prefisso che vedo prendendo link lsa
+    def set_prefix(self, prefix):
+        self.prefix=prefix
+        self.id = and_bit_to_bit(self.id, prefix)
 
     def set_dr_bdr(self, dr, bdr):
         self.dr = dr
@@ -208,16 +234,16 @@ class Link:
             "type": self.type,
             "options": self.options,
             "metric": self.metric,
-            "mask": self.mask,
+            "prefix": self.prefix,
             "endpoints": self.endpoints,
             "dr": self.dr,
             "bdr": self.bdr
         }
 
 class Route:
-    def __init__(self, ip, mask, via, metric, metric_type=None):
+    def __init__(self, ip, masklen, via, metric, metric_type=None):
         self.ip = ip
-        self.mask = mask
+        self.masklen = masklen
         self.via = via
         self.metric = metric
         self.metric_type = metric_type
@@ -225,7 +251,7 @@ class Route:
     def toJSON(self):
         return {
             "ip": self.ip,
-            "mask": self.mask,
+            "prefix_len": self.masklen,
             "via": self.via,
             "metric": self.metric,
             "metric_type": self.metric_type
@@ -246,11 +272,43 @@ class Path_To_ASBR:
         }
 
 
-def and_bit_to_bit(address, mask):
-    address_parts = list(map(int, address.split('.')))
-    mask_parts = list(map(int, mask.split('.')))
-    
-    net_address_parts = [address_parts[i] & mask_parts[i] for i in range(4)]
-    
-    net_address = '.'.join(map(str, net_address_parts))
+# dato che esprimere la maschera per intero occuperebbe spazio, verrà specificato direttamente 
+# il valore ( ad esempio /64 ) e poi verrà derivata la maschera
+def and_bit_to_bit(address, prefix):
+    mask_gen = generate_mask(prefix)
+    cv_mask= [int(y,16) for y in mask_gen]
+    double_semicolon_split=address.split('::')
+    net_address=""
+    if len(double_semicolon_split)==1:
+        #caso in cui non vi è doppio semicolon
+        # il contenuto dell'array coincide con l'indirizzo iniziale
+        semicolon_split= [int(x,16) for x in address.split(':')]
+        net_address_parts= [semicolon_split[i] & cv_mask[i] for i in range(8)]
+        hex_address=[f"{ha:04x}" for ha in net_address_parts]
+        net_address= ':'.join(map(str,hex_address))
+    else:
+        # dato che ho il doppio semicolon devo trovare il punto dove inserire
+        # la sequenza di zeri
+        given_address= []
+        first_block=double_semicolon_split[0].split(':')
+        second_block=double_semicolon_split[1].split(':')
+        already_assigned= len(first_block)+len(second_block)
+        for x in first_block:
+            given_address.append(x)
+        for i in range (8-already_assigned):
+            given_address.append('0000')
+        for x in second_block:
+            given_address.append(x)
+
+        cv_address=[ int(ha,16) for ha in given_address]
+        net_address_parts=[cv_address[i] & cv_mask[i] for i in range(8)]
+        hex_address=[f"{ha:04x}" for ha in net_address_parts]
+        net_address= ':'.join(map(str,hex_address))
     return net_address
+
+# metodo che genera la lista con i gruppi della maschera
+def generate_mask(pre):
+    mask= "1" * pre + "0" * (128-pre)
+    mask_blocks = [mask[i:i+16] for i in range(0,128,16)]
+    hex_mask= [f"{int(mb,2):04x}" for mb in mask_blocks]
+    return hex_mask

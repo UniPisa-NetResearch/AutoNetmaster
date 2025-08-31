@@ -1,17 +1,17 @@
 import pyeapi
 import json
 from areas.get_areas import get_areas
-def get_asbr_summary_lsa_info(target_node):
+def get_iar_lsa_info(target_node):
     
     command= "show ipv6 ospf database area "
 
     node_areas= get_areas(target_node)
-    lsa_type_4=[]
+    lsa_type_4={}
     # dato che non esiste un comando che da tutti gli lsa di tipo router senza specificare l'area
     # bisogna eseguire il comando per ogni area
     for a in node_areas:
         output=target_node.enable(command+a+" inter-area-router detail")
         area_entries= output[0]["result"]["vrfs"]["default"]["instList"]["10"]["ospf3AreaEntries"]
         if not(area_entries[str(a)]["ospf3AreaLsaList"]==[]):
-            lsa_type_4.append(area_entries)
+            lsa_type_4[str(a)]=area_entries[str(a)]
     return lsa_type_4
