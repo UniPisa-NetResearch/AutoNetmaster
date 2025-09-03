@@ -20,19 +20,20 @@ topology:
       startup-config: configs/isp.cfg
     H1:
       kind: linux
-      image: alpine:latest
+      image: python:3.12.3-alpine
       binds:
         - /home/daniele/AutoNetMaster:/AutoNetMaster
     H2:
       kind: linux
-      image: alpine:latest
+      image: python:3.12.3-alpine
       binds:
         - /home/daniele/AutoNetMaster:/AutoNetMaster
     H3:
       kind: linux
-      image: alpine:latest
+      image: python:3.12.3-alpine
       binds:
         - /home/daniele/AutoNetMaster:/AutoNetMaster
+
   links:
     - endpoints: ["A:eth1", "B:eth2"]
     - endpoints: ["B:eth1", "C:eth1"]

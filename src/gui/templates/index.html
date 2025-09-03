@@ -30,11 +30,9 @@
 
     <script type="text/javascript">
         let router = "{{ target|safe }}";
-        console.log(router);
-
-        let networkData = {{ data|safe }};
+        console.log(router)
+        let networkData = {{data|safe}};
         console.log(networkData);
-
         let networkRouters = {{ network_routers|safe }};
         console.log(networkRouters);
 
@@ -88,7 +86,7 @@
                     const interAreaList = document.createElement('ul');
                     area.ospf_inter_area_routes.forEach(route => {
                         const listItem = document.createElement('li');
-                        listItem.textContent = `Dest: ${route.ip}/${find_subnet_length(route.mask)} via ${route.via}`;
+                        listItem.textContent = `Dest: ${route.ip}/${route.prefix_len} via ${route.via}`;
                         interAreaList.appendChild(listItem);
                     });
                     infoDiv.appendChild(interAreaList);
@@ -151,7 +149,7 @@
                     edges.push({
                         from: new_node, 
                         to: switchId, 
-                        label: link.id + " / " + find_subnet_length(link.mask), 
+                        label: link.id + " / " + find_subnet_length(link.prefix), 
                         title: link.id,
                         arrows: 'none',
                         color: { color: areaColor }
@@ -160,7 +158,7 @@
                     edges.push({
                         from: switchId, 
                         to: endpoints[0], 
-                        label: link.id + " / " + find_subnet_length(link.mask), 
+                        label: link.id + " / " + find_subnet_length(link.prefix), 
                         title: link.id,
                         arrows: 'none',
                         color: { color: areaColor }
@@ -184,7 +182,7 @@
                         edges.push({
                             from: switchId,
                             to: endpoints[i],
-                            label: link.id + " / " + find_subnet_length(link.mask),
+                            label: link.id + " / " + find_subnet_length(link.prefix),
                             title: link.id,
                             arrows: 'none',
                             color: { color: areaColor }
@@ -196,7 +194,7 @@
                     edges.push({ 
                         from: endpoint1, 
                         to: endpoint2, 
-                        label: link.id + " / " + find_subnet_length(link.mask), 
+                        label: link.id + " / " + find_subnet_length(link.prefix), 
                         title: link.id,
                         arrows: 'none',
                         color: { color: areaColor }
@@ -214,7 +212,7 @@
             const externalRoutesList = document.createElement('ul');
             networkData.external_routes.forEach(route => {
                 const listItem = document.createElement('li');
-                listItem.textContent = `Dest: ${route.ip}/${find_subnet_length(route.mask)} via ${route.via} (metrica: ${route.metric}, tipo: ${route.metric_type})`;
+                listItem.textContent = `Dest: ${route.ip}/${route.prefix_len} via ${route.via} (metrica: ${route.metric}, tipo: ${route.metric_type})`;
                 externalRoutesList.appendChild(listItem);
             });
             externalRoutesDiv.appendChild(externalRoutesList);
@@ -275,8 +273,8 @@
 
                 let infoDiv = document.getElementById('info');
                 infoDiv.innerHTML = `<h3>Dettagli Link</h3>
-                    <p><strong>IP:</strong> ${edge.id}</p>
-                    <p><strong>Mask:</strong> ${edge.mask}</p>
+                    <p><strong>IP:</strong> [${edge.id}]</p>
+                    <p><strong>Prefix length:</strong> ${find_subnet_length(edge.prefix)}</p>
                     <p><strong>Tipo:</strong> ${edge.type}</p>
                     <p><strong>Metric:</strong> ${edge.metric}</p>
                     ${edge.dr ? `<p><strong>Designated Router:</strong> ${edge.dr}</p>` : ''}
@@ -295,19 +293,24 @@
                     return;
                 }
 
-                let infoDiv = document.getElementById('info');
-
-                infoDiv.innerHTML = `
+                let infoDiv = document.getElementById('info'); 
+                    //    <strong>Neighbor IP:</strong> ${neighbor.neighbor_ip_addr}
+                //devo considerare più rotte e più indirizzi per le interfacce
+                    infoDiv.innerHTML = `
                     <h3>Hostname: ${node.hostname}</h3>
                     <p><strong>Router ID:</strong> ${node.router_id}</p>
                 
                     <h4>Interfaces:</h4>
-                    <ul>
+                    <ul>    
                     ${node.interfaces.map(iface => `
                         <li>
-                        <strong>${iface.name}</strong>
-                        <strong>IP:</strong> ${iface.ip}
-                        <strong>Masklen:</strong> ${iface.masklen}
+                        <strong>${iface.id}</strong>
+                        <br> 
+                        ${iface.addresses.map( add =>`
+                            <strong>IP:</strong> ${add.address}
+                            <strong>Prefix length:</strong> ${add.prefix_length}
+                        `).join('<br>')}    
+                        <br>
                         <strong>Status:</strong> ${iface.interface_status}
                         <strong>Line Protocol:</strong> ${iface.line_protocol_status}
                         </li>
@@ -320,7 +323,6 @@
                         <li>
                         <strong>Router ID:</strong> ${neighbor.router_id}
                         <strong>Interface:</strong> ${neighbor.interface}
-                        <strong>Neighbor IP:</strong> ${neighbor.neighbor_ip_addr}
                         <strong>Adjacency State:</strong> ${neighbor.adjacency_state}
                         </li>
                     `).join('')}
@@ -330,11 +332,13 @@
                     <ul>
                     ${node.route_table.map(route => `
                         <li>
-                        <strong>IP:</strong> ${route.ip}
-                        <strong>Masklen:</strong> ${route.masklen}
-                        <strong>Via:</strong> ${route.via}
-                        <strong>Interface:</strong> ${route.interface}
-                        <strong>Protocol:</strong> ${route.protocol}
+                        <strong>IP:</strong> [${route.ip}]
+                        <strong>Prefixlen:</strong> ${route.prefix_len}<br>
+                        ${route.vias.map(via_entry=>`
+                            <strong>Via:</strong> ${via_entry.via}
+                            <strong>Interface:</strong> ${via_entry.interface}                      
+                        `).join('<br>')}
+                            <br><strong>Protocol:</strong> ${route.protocol}
                         </li>
                     `).join('')}
                     </ul>`;
@@ -342,17 +346,17 @@
              }
         });        
 
-        function find_subnet_length(mask) {
-            const octets = mask.split('.');
+        function find_subnet_length(prefix) {
+            return prefix.split('/')[1]
 
-            let bitCount = 0;
+            // let bitCount = 0;
 
-            for (let i = 0; i < octets.length; i++) {
-                let binaryOctet = parseInt(octets[i]).toString(2).padStart(8, '0');
-                bitCount += binaryOctet.split('1').length - 1;
-            }
+            // for (let i = 0; i < octets.length; i++) {
+            //     let binaryOctet = parseInt(octets[i]).toString(2).padStart(8, '0');
+            //     bitCount += binaryOctet.split('1').length - 1;
+            // }
 
-            return bitCount;
+            //return prefixLen;
         }
     </script>
 </body>

@@ -15,7 +15,6 @@ def get_interfaces(target_node):
         addresses.append({
             'address':interface_details["linkLocal"]["address"],
             'prefix_length': interface_details["linkLocal"]["subnet"].split('/')[-1],
-            'active': interface_details["linkLocal"]["active"],
             'type':'link local'
         })
         # inserisco gli altri indirizzi configurati
@@ -23,7 +22,6 @@ def get_interfaces(target_node):
             addresses.append({
                 'address':add["address"],
                 'prefix_length': add["subnet"].split('/')[-1],
-                'active': add["active"],
                 'type':'config'
             })
 

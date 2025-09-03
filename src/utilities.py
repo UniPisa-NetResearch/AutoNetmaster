@@ -63,6 +63,12 @@ class Area:
     def add_path_to_asbr(self, path):
         self.paths_to_asbrs.add(path)
 
+    def search_route(self,ip,masklen):
+        for r in self.ospf_inter_area_routes:
+            if r.ip==ip and r.masklen==masklen:
+                return r
+        return None
+    
     def __str__(self):
         topology_str = f"area {self.area_id}:\n  nodes:"
 
@@ -85,8 +91,10 @@ class Area:
         for route in self.ospf_inter_area_routes:
             topology_str += f"\n    - ip: [{route.ip}]"
             topology_str += f"\n      - masklen: {route.masklen}"
-            topology_str += f"\n      - via: {route.via}"
-            topology_str += f"\n      - metric: {route.metric}"
+            topology_str += f"\n      - via:\n"
+            for v in route.via:
+                topology_str += f"        - {v}\n"
+            topology_str += f"      - metric: {route.metric}"
 
         topology_str += "\n  paths to ASBRs:"
         
@@ -159,7 +167,7 @@ class Node:
         for iface in self.interfaces:
             interface_str += f"       ID: {iface['id']},"
             for ind_int in iface['addresses']:
-                interface_str+=f"\n         address:{ind_int['address']}/{ind_int['prefix_length']}, active:{ind_int['active']}, type:{ind_int['type']}"
+                interface_str+=f"\n         address:{ind_int['address']}/{ind_int['prefix_length']}, type:{ind_int['type']}"
             interface_str+=f"\n         Interface Status: {iface['interface_status']}, Line Protocol Status: {iface['line_protocol_status']}\n"
             
         #Neighbor ip address: {n['neighbor_ip_addr']},
@@ -224,6 +232,12 @@ class Link:
         self.prefix=prefix
         self.id = and_bit_to_bit(self.id, prefix)
 
+    def checkNodeList(self, nodes):
+        for l in self.endpoints:
+            if l not in nodes:
+                return False
+        return True
+
     def set_dr_bdr(self, dr, bdr):
         self.dr = dr
         self.bdr = bdr
@@ -244,9 +258,12 @@ class Route:
     def __init__(self, ip, masklen, via, metric, metric_type=None):
         self.ip = ip
         self.masklen = masklen
-        self.via = via
+        self.via = [via]
         self.metric = metric
         self.metric_type = metric_type
+
+    def add_via(self, other_via):
+        self.via.append(other_via)
 
     def toJSON(self):
         return {
@@ -263,7 +280,7 @@ class Path_To_ASBR:
         self.asbr = asbr
         self.via = via
         self.metric = metric
-        
+    
     def toJSON(self):
         return {
             "asbr": self.asbr,
