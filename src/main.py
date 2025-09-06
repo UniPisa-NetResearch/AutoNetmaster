@@ -72,11 +72,6 @@ for area_data in router_lsa_1:
         new_area.add_node(advertising_router)
         
         for router_link in lsa_entry['ospf3RouterLsa']['routerLsaLinks']:
-            # questo controllo viene fatto per evitare
-            # che il router interpreti la raggiungibilità verso
-            # se stesso come un ulteriore link
-            # if router_link['neighborRouterId'] == advertising_router:
-            #     continue
             interface_id = router_link['interfaceId']
             interface_type = router_link['interfaceType']
             neighbor_router_id= router_link['neighborRouterId']
@@ -103,6 +98,8 @@ for area_data in router_lsa_1:
                         link_id=lsa8_entry['ospf3LinkLsa']['prefixList'][0]['prefix']
                         break
 
+            # si tratta di un link di cui non posso recuperare le informazioni direttamente
+            # ma con l'aiuto di un altro nodo
             if link_id=="" :
                 continue
 
@@ -127,13 +124,10 @@ for area_data in router_lsa_1:
 
     network_topology.add_area(new_area)
 
-#recupero le informazioni sulle stub network non adiacenti dagli nap lsa
+#recupero le informazioni sulle stub network dagli nap lsa
 for ll in nap_lsa_9:
     for lsa_9_entry in nap_lsa_9[ll]['ospf3AreaLsaList']:
         lsa_nap=lsa_9_entry['ospf3IntraAreaPrefixLsa']
-        # if lsa_nap['referencedLsaType']!='routerLsa':
-        #     continue
-        #if advertising_router == lsa_nap['referencedAdvertisingRouter'] and link_state_id == lsa_nap['referencedLinkStateId'] and lsa_nap['numPrefixes']!=0:
         if lsa_nap['referencedLsaType']!='routerLsa':
             continue
         link_id=lsa_nap['prefixList'][0]['prefix'] 
@@ -146,22 +140,16 @@ for ll in nap_lsa_9:
 network_lsa_2 = get_network_lsa_info(target_node)
 
 for area_data in network_lsa_2:
-    #for target_area in network_topology.areas:
-        for lsa_entry in network_lsa_2[area_data]['ospf3AreaLsaList']:
-            # for lsa_entry in area_db_entry['areaLsas']:
+       for lsa_entry in network_lsa_2[area_data]['ospf3AreaLsaList']:
                 link_state_id = lsa_entry['linkStateId']
-                #indirizzi non più presenti negli lsa
-                #network_mask = lsa_entry['ospfNetworkLsa']['networkMask']
                 dr = lsa_entry['advertisingRouter']
                 attached_routers = lsa_entry['ospf3NetworkLsa']['attachedRouters']
-                #print(attached_routers)
                 #cambiare la scelta del DBR, potrei rischiare di inserire il DR anche come BDR
                 bdr = attached_routers[0] if len(attached_routers) > 1 else None
                 adjacent=True
                 # devo scorrere i nap lsa per poter ottenere informazione
                 # su network lsa
                 network_prefix=""
-               #for lsa9_area in nap_lsa_9:
                 for lsa9_entry in nap_lsa_9[area_data]['ospf3AreaLsaList']:
                         if lsa9_entry['ospf3IntraAreaPrefixLsa']['referencedLsaType']!='networkLsa':
                             continue
@@ -181,7 +169,7 @@ for area_data in network_lsa_2:
                                 network_topology.find_target_area(area_data).add_link(new_link)
                                 adjacent=False
 
-
+                        # si tratta di un link adiacente e di cui ho il prefisso
                         if adjacent:                    
                             for link in network_topology.find_target_area(area_data=area_data).links:
                                 # qua devo fare il confronto con prefix
@@ -203,6 +191,8 @@ for area_data in iar_lsa_3:
             via = lsa_entry['advertisingRouter']
             metric = lsa_entry['ospf3InterAreaPrefixLsa']['metric'] 
 
+            # se la route è già esistente, vuol dire che sto aggiungendo una
+            # via per raggiungere la destinazione
             existing=target_area.search_route(ip,mask)
             if existing==None:
                 route = Route(ip, mask, via, metric)
@@ -277,9 +267,10 @@ while not queue.empty():
     current_router = queue.get()
     neighbors_dict = {n["router_id"]: n for n in current_router.neighbors}
 
+    # utilizzo il router ID perché sarà l'indirizzo dell'interfaccia di loopback
+    # del vicino a cui posso collegarmi per recuperare le informazioni
     for nghb in current_router.neighbors:
         nghb_id = nghb['router_id']
-        #nghb_ip = nghb['neighbor_ip_addr']
 
         if nghb_id not in network_routers: # and nghb_id != router.router_id:
             new_router, new_neighbors = discover_router(nghb_id)

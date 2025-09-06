@@ -2,6 +2,7 @@ import pyeapi
 import json
 
 def get_interfaces(target_node):
+    "Funzione che restituisce le interfacce ipv6 configurate del nodo"
     result = target_node.enable('show ipv6 interface brief')
 
     interfaces = []

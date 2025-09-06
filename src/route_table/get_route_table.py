@@ -2,11 +2,12 @@ import pyeapi
 import json
 
 def get_route_table(target_node):
+    "Funzione che recupera la route table per routing ipv6 del nodo"
+
     result = target_node.enable('show ipv6 route')
     table_entries = []
     routes = result[0]['result']['routes']
-    # NOTA: ATTENZIONE CHE BISOGNA GESTIRE IN FASE DI STAMPA IL CASO IN CUI
-    # CI SIANO PIU' VIE
+    # considero che potrebbe esseerci più di una via 
     for route, details in routes.items():
         vias=[]
         for out_via in details.get('vias',[{}]):

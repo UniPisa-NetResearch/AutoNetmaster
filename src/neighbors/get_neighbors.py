@@ -2,6 +2,8 @@ import pyeapi
 import json
 
 def get_neighbors(target_node):
+    "Funzione che recupera le informazioni dei vicini del nodo"
+
     neighbors_data = target_node.enable('show ipv6 ospf neighbor')
     
     neighbors_list = []

@@ -2,6 +2,7 @@ import pyeapi
 import json
 
 def get_protocol_info(target_node):
+    "Funzione che recupera le informazioni sulla configurazione del protocollo OSPFv3 del nodo"
 
     command = "show ipv6 ospf"
     info = target_node.enable(command)[0]['result']

@@ -2,6 +2,7 @@ import pyeapi
 import json
 from areas.get_areas import get_areas
 def get_router_lsa_info(target_node):
+    "Funzione che recupera gli lsa di tipo router dal database OSPFv3 del nodo"
 
     command= "show ipv6 ospf database area "
 

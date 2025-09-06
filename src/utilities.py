@@ -146,7 +146,6 @@ class Node:
         self.neighbors.append({
             "interface_id": interface_id,
             "router_id": neighbor_router_id,
-            #"neighbor_ip_addr": neighbor_ip_addr,
             "adjacency_state": adjacency_state,
             "designated_router": designated_router,
             "backup_designated_router": backup_designated_router
@@ -176,12 +175,6 @@ class Node:
             f"Adj-State: {n['adjacency_state']}, DR: {n['designated_router']}, "
             f"BDR: {n['backup_designated_router']}" for n in self.neighbors
         )
-        #le vie devono essere stampate per conto proprio, perché potrebbe esserci più di una via
-        #route_table_str = "\n        ".join(
-         #   f"Destination: {route['ip']}/{route['masklen']}"
-          #  f", Via: {route['via']}, Interface: {route['interface']}, Protocol: {route['protocol']}"   
-           # for route in self.route_table
-            #)
         
         route_table_str=""
         for route in self.route_table:
