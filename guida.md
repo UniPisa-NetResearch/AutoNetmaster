@@ -49,7 +49,7 @@ Inoltre si tenga in considerazione il _Dockerfile_ presente nella repository per
 
 Nei file di test il nome utilizzato per il container utilizzato è *pc_firefox_python* ed è un'estensione del container python:3.12.3-slim, quindi se si intendono replicare gli esempi si effettui il pull di questa immagine, tramite il comando:
 
-`docker pull python:3.12.3_slim`
+`docker pull python:3.12.3-slim`
 
 L'utente è libero di scegliere comunque un'altra immagine e modificare il Dockerfile modificando il parametro del comando _FROM_ ( presente alla prima riga del Dockerfile ) inserendo il nome dell'immagine desiderata
 
