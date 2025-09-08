@@ -39,7 +39,11 @@ Supponendo di voler attivare gli switch SW1 e SW2 si dovrà eseguire il comando 
 Per verificare la correttezza si può eseguire il comando:
 ip link show [nome_switch]
 
-Le immagini usate per i nodi che offrono servizi a livello di rete sono container con immagini di **nodi ARISTA** (nei test e' utilizzata immagine _ceos:4.34.0F_), nei quali si dovrà anche riscrivere l'attributo binds ed inserire il path dell'host che si vuole rendere visibile al container.
+Le immagini usate per i nodi che offrono servizi a livello di rete sono container con immagini di **nodi ARISTA** , nei quali si dovrà anche riscrivere l'attributo binds ed inserire il path dell'host che si vuole rendere visibile al container.
+
+Per recuperare le immagini Arista, l'utente dovrà registrarsi [sito arista](https://www.arista.com/en/) e poi scaricare l'archivio con l'immagine desiderata (nei test e' utilizzata immagine _ceos:4.34.0F_) e poi importarla tramite il comando:
+
+`docker import [nome archivio] [nome immagine]`
 
 Inoltre si tenga in considerazione il _Dockerfile_ presente nella repository per creare un container personalizzato che contiene tutte le componenti necessarie per eseguire l'applicazione, in particolare si dovrà efferruare una build con docker eseguendo il comando:
 
