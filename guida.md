@@ -45,7 +45,7 @@ Inoltre si tenga in considerazione il _Dockerfile_ presente nella repository per
 
 `docker build -t [nome container personalizzato] .` 
 
-**Importante:** Comando da eseguire nella stessa cartella del Dockerfile altrimenti si deve sostituire _._ con il path del Dockerfile
+**Importante:** Comando da eseguire nella stessa cartella del Dockerfile altrimenti si deve sostituire `.` con il path del Dockerfile
 
 Nei file di test il nome utilizzato per il container utilizzato è *pc_firefox_python* ed è un'estensione del container python:3.12.3-slim, quindi se si intendono replicare gli esempi si effettui il pull di questa immagine, tramite il comando:
 
