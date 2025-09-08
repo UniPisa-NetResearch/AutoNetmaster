@@ -15,7 +15,7 @@ Nel caso in cui si stia usando un host con sistema operativo differente da uno l
 
 [ContainerLab](www.containerlab.dev) è un software che ha il ruolo di emulare una topologia di rete attraverso l'uso di container le cui immagini vengono specificate all'interno di un **file yaml** ( per esempio si guardino i casi di test ) dove verranno indicati quindi i nodi della nostra rete (inclusi gli endpoint) e i link che collegano i suddetti. Per poter emulare la nostra topologia di rete si potrà eseguire uno script:
 
-_curl -sL https://containerlab.dev/setup | sudo -E bash -s "all"_
+`curl -sL https://containerlab.dev/setup | sudo -E bash -s "all"`
 
 
 **Fonte sezione [QuickStart](https://containerlab.dev/quickstart/) di ContainerLab**
@@ -24,17 +24,17 @@ Una volta installato basterà un semplice IDE oppure un editor per poter scriver
 
 Per emulare la topologia dovrà essere eseguito il comando:
 
-_sudo clab -t [percorso file topologia] deploy_
+`sudo clab -t [percorso file topologia] deploy`
 
 Invece per terminare l'emulazione si dovrà eseguire:
 
-_sudo clab -t [percorso file topologia] destroy_
+`sudo clab -t [percorso file topologia] destroy`
 
 E' necessario creare manualmente un bridge, poiche' CONTAINERlab non supporta nativamente gli switch e l'utilizzo di nodi Arista per la loro emulazione sarebbe prestazionalmente costoso, è stato, quindi, predisposto uno script activate_bridge.sh da eseguire con privilegi di su (supervisor user) per creare i birdge i cui nomi sono passati in una stringa separati da spazio
 
 Esempio: 
 Supponendo di voler attivare gli switch SW1 e SW2 si dovrà eseguire il comando :
-sudo ./activate_bridge.sh "SW1 SW2"
+`sudo ./activate_bridge.sh "SW1 SW2"`
 
 Per verificare la correttezza si può eseguire il comando:
 ip link show [nome_switch]
@@ -43,13 +43,13 @@ Le immagini usate per i nodi che offrono servizi a livello di rete sono containe
 
 Inoltre si tenga in considerazione il _Dockerfile_ presente nella repository per creare un container personalizzato che contiene tutte le componenti necessarie per eseguire l'applicazione, in particolare si dovrà efferruare una build con docker eseguendo il comando:
 
-_docker build -t [nome container personalizzato] ._ 
+`docker build -t [nome container personalizzato] .` 
 
 **Importante:** Comando da eseguire nella stessa cartella del Dockerfile altrimenti si deve sostituire _._ con il path del Dockerfile
 
 Nei file di test il nome utilizzato per il container utilizzato è *pc_firefox_python* ed è un'estensione del container python:3.12.3-slim, quindi se si intendono replicare gli esempi si effettui il pull di questa immagine, tramite il comando:
 
-*docker pull python:3.12.3_slim*
+`docker pull python:3.12.3_slim`
 
 L'utente è libero di scegliere comunque un'altra immagine e modificare il Dockerfile modificando il parametro del comando _FROM_ ( presente alla prima riga del Dockerfile ) inserendo il nome dell'immagine desiderata
 
@@ -60,11 +60,11 @@ Per ogni container dovrà essere configurato un indirizzo IPv4 e una route di de
 
 (Comando per inserire un indirizzo IPv4 in un'interfaccia dell'endpoint)
 
-_ip addr add [indirizzo IPv4] dev [nome interfaccia]_
+`ip addr add [indirizzo IPv4] dev [nome interfaccia]`
 
 (Comando per aggiungere o rimpiazzare rotta di default)
 
-_ip route [add/replace] default via [IP del gateway di default]_
+`ip route [add/replace] default via [IP del gateway di default]`
 
 Questi passaggi sono necessari perché per ottenere le informazioni dai nodi Arista vengono sfruttati gli IP delle interfacce di loopback, indicati nell'istanza IPv6 come router ID. Per garantire la connettività tra host e nodi è necessario configurare OSPFv2 nella rete, si assegna il compito all'utente di configurare la rete con OSPFv2, tenendo bene a mente che gli indirizzi delle interfacce di loopback saranno necessari per l'utilizzo dell'applicazione. Si suggerisce comunque di osservare i casi di test per avere ulteriori dettagli su questa procedura.
 
@@ -76,9 +76,7 @@ Il linguaggio di programmazione python viene utilizzato per sfruttare il modulo 
 
 I moduli python possono essere installati tramite **pip** eseguendo i comandi:
 
-_pip install pyeapi_
-
-_pip install Flask_
+`pip install pyeapi && pip install Flask`
 
 #### Vis.js
 [Vis.js](https://visjs.org/) è una libreria javascript che viene utilizzata per creare grafi ( composti da nodi e archi ) su una pagina web e nel nostro caso viene utilizzata per riprodurre graficamente la topologia di rete. 
@@ -89,13 +87,15 @@ Una volta completati tutti questi step di installazione, si potrà eseguire scri
 
 (Supponendo che il nostro router ID sia 10.0.0.1)
 
-Si dovrà fare:  *./ospf_mgmt.sh 10.0.0.1*
+Si dovrà fare:  
+
+`./ospf_mgmt.sh 10.0.0.1`
 
 si aprirà quindi un terminale in cui l'utente potrà vedere le informazioni sul nodo il cui router ID viene passato come parametro ( in quanto indirizzo dell'interfaccia di loopback ) e potrà inserire uno tra i comandi disponibili per effettuare operazioni ( saranno visualizzabili digitando _help_)
 
 Per accedere ai container si può utilizzare **docker**, in particolare per accedere alla bash del nostro container dovremo eseguire da terminale dell'host:
 
-_docker exec -it [nome container] bash_
+`docker exec -it [nome container] bash`
 
 Così facendo si aprirà una CLI che opererà sul nostro container e dal quale si potrà eseguire la nostra applicazione.
 
