@@ -24,19 +24,28 @@ topology:
       startup-config: configs/isp.cfg
     H1:
       kind: linux
-      image: alpine:latest
+      image: pc_firefox_python
       binds:
         - /home/daniele/AutoNetMaster:/AutoNetMaster
+      ports:
+        - 5001:5000
+
     H2:
       kind: linux
-      image: alpine:latest
+      image: pc_firefox_python
       binds:
         - /home/daniele/AutoNetMaster:/AutoNetMaster
+      ports:
+        - 5002:5000
+
     H3:
       kind: linux
-      image: alpine:latest
+      image: pc_firefox_python
       binds:
         - /home/daniele/AutoNetMaster:/AutoNetMaster
+      ports:
+        - 5003:5000
+
     SW:
       kind: bridge
     
