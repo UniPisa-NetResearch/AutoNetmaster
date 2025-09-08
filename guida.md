@@ -53,15 +53,17 @@ Nei file di test il nome utilizzato per il container utilizzato è *pc_firefox_p
 
 L'utente è libero di scegliere comunque un'altra immagine e modificare il Dockerfile modificando il parametro del comando _FROM_ ( presente alla prima riga del Dockerfile ) inserendo il nome dell'immagine desiderata
 
-Un altro passaggio che l'utente dovrà fare per poter sfruttare a pieno l'applicazione sarà effetuare un bind tra porta del container e porta dell'host, in particolare, l'applicazione userà la **porta 5000** che dovrà essere mappata nell'host e che verrà poi utilizzata quando si dovrà accedere al localhost (127.0.0.1). Su quali porte mappare si affida compito all'utente la scelta di suddette, qualora ce ne fosse bisogno si possono guardare i casi di test.
+Un altro passaggio che l'utente dovrà fare per poter sfruttare a pieno l'applicazione sarà effetuare un'associazione tra porta del container e porta dell'host, in particolare, l'applicazione userà la **porta 5000** che dovrà essere mappata nell'host e che verrà poi utilizzata quando si dovrà accedere al localhost (127.0.0.1). Su quali porte mappare si affida compito all'utente la scelta di suddette, qualora ce ne fosse bisogno si possono guardare i casi di test.
 
 #### Configurazione container
 Per ogni container dovrà essere configurato un indirizzo IPv4 e una route di default verso il gateway. Si lascia libertà all'utente di fare le configurazioni, in quanto potrebbero esserci più dispositivi a cui assegnare indirizzi IPv4 e più route di deafult, menziono comunque i comandi necessari:
 
 (Comando per inserire un indirizzo IPv4 in un'interfaccia dell'endpoint)
+
 _ip addr add [indirizzo IPv4] dev [nome interfaccia]_
 
 (Comando per aggiungere o rimpiazzare rotta di default)
+
 _ip route [add/replace] default via [IP del gateway di default]_
 
 Questi passaggi sono necessari perché per ottenere le informazioni dai nodi Arista vengono sfruttati gli IP delle interfacce di loopback, indicati nell'istanza IPv6 come router ID. Per garantire la connettività tra host e nodi è necessario configurare OSPFv2 nella rete, si assegna il compito all'utente di configurare la rete con OSPFv2, tenendo bene a mente che gli indirizzi delle interfacce di loopback saranno necessari per l'utilizzo dell'applicazione. Si suggerisce comunque di osservare i casi di test per avere ulteriori dettagli su questa procedura.
