@@ -11,7 +11,7 @@ Per poter usare il programma si dovranno installare diverse componenti sull'host
 ### WSL
 Nel caso in cui si stia usando un host con sistema operativo differente da uno linux-based, sarà necessario installare WSL ( Windows Subsystem Linux ) all'interno del quale potremo poi eseguire tutte le operazioni necessarie. Per installarlo si troveranno maggiori dettagli sul sito [ContainerLab](www.containerlab.dev)
 
-### Container lab
+### ContainerLab
 
 [ContainerLab](www.containerlab.dev) è un software che ha il ruolo di emulare una topologia di rete attraverso l'uso di container le cui immagini vengono specificate all'interno di un **file yaml** ( per esempio si guardino i casi di test ) dove verranno indicati quindi i nodi della nostra rete (inclusi gli endpoint) e i link che collegano i suddetti. Per poter emulare la nostra topologia di rete si potrà eseguire uno script:
 
