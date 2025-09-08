@@ -85,7 +85,7 @@ I moduli python possono essere installati tramite **pip** eseguendo i comandi:
 ## Utilizzo dell'applicazione
 Una volta completati tutti questi step di installazione, si potrà eseguire scrivere la topologia di rete, emularla ed interagirci con l'applicazione. In particolare si dovrà eseguire lo script **ospf_mgmt.sh** passando come parametro il router ID del nodo da cui si vuole partire per ricostruire la topologia, ad esempio:
 
-(Supponendo che il nostro router ID sia 10.0.0.1)
+(Supponendo che il router ID scelto sia 10.0.0.1)
 
 Si dovrà fare:  
 
