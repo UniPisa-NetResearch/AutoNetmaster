@@ -37,7 +37,8 @@ Supponendo di voler attivare gli switch SW1 e SW2 si dovrà eseguire il comando 
 `sudo ./activate_bridge.sh "SW1 SW2"`
 
 Per verificare la correttezza si può eseguire il comando:
-ip link show [nome_switch]
+
+`ip link show [nome_switch]`
 
 Le immagini usate per i nodi che offrono servizi a livello di rete sono container con immagini di **nodi ARISTA** , nei quali si dovrà anche riscrivere l'attributo binds ed inserire il path dell'host che si vuole rendere visibile al container.
 
