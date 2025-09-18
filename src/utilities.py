@@ -221,15 +221,15 @@ class Link:
     # di front end uso indirizzo configurato (fd00... oppure 2001:db8...)
     # non il link local
     # guardo il prefisso che vedo prendendo link lsa
-    def set_prefix(self, prefix):
-        self.prefix=prefix
-        self.id = and_bit_to_bit(self.id, prefix)
+    # def set_prefix(self, prefix):
+    #     self.prefix=prefix
+    #     self.id = and_bit_to_bit(self.id, prefix)
 
-    def checkNodeList(self, nodes):
-        for l in self.endpoints:
-            if l not in nodes:
-                return False
-        return True
+    # def checkNodeList(self, nodes):
+    #     for l in self.endpoints:
+    #         if l not in nodes:
+    #             return False
+    #     return True
 
     def set_dr_bdr(self, dr, bdr):
         self.dr = dr

@@ -89,13 +89,14 @@ for area_data in router_lsa_1:
                         continue
                     if lsa8_entry['linkStateId'] == interface_id and lsa8_entry['advertisingRouter'] == advertising_router:
                         # riguarda il router advertising
-                        prefix_l=lsa8_entry['ospf3LinkLsa']['prefixList'][0]['prefixLength']
-                        link_id=lsa8_entry['ospf3LinkLsa']['prefixList'][0]['prefix']
+                        l8_e=lsa8_entry['ospf3LinkLsa']['prefixList'][0]
+                        prefix_l=l8_e['prefixLength']
+                        link_id=l8_e['prefix']
                         break
                     elif lsa8_entry['linkStateId'] == neighbor_interface_id and lsa8_entry['advertisingRouter'] == neighbor_router_id:
                         # ho informazioni sul vicino
-                        prefix_l=lsa8_entry['ospf3LinkLsa']['prefixList'][0]['prefixLength']
-                        link_id=lsa8_entry['ospf3LinkLsa']['prefixList'][0]['prefix']
+                        prefix_l=l8_e['prefixLength']
+                        link_id=l8_e['prefix']
                         break
 
             # si tratta di un link di cui non posso recuperare le informazioni direttamente
@@ -151,19 +152,20 @@ for area_data in network_lsa_2:
                 # su network lsa
                 network_prefix=""
                 for lsa9_entry in nap_lsa_9[area_data]['ospf3AreaLsaList']:
-                        if lsa9_entry['ospf3IntraAreaPrefixLsa']['referencedLsaType']!='networkLsa':
+                        l9_e=lsa9_entry['ospf3IntraAreaPrefixLsa']
+                        if l9_e['referencedLsaType']!='networkLsa':
                             continue
-                        elif protocol_info['Router ID'] in attached_routers and dr == lsa9_entry['ospf3IntraAreaPrefixLsa']['referencedAdvertisingRouter'] and  link_state_id == lsa9_entry['ospf3IntraAreaPrefixLsa']['referencedLinkStateId']:
-                             network_prefix= lsa9_entry['ospf3IntraAreaPrefixLsa']['prefixList'][0]['prefix']   
+                        elif protocol_info['Router ID'] in attached_routers and dr == l9_e['referencedAdvertisingRouter'] and  link_state_id == l9_e['referencedLinkStateId']:
+                             network_prefix= l9_e['prefixList'][0]['prefix']   
                         elif protocol_info['Router ID'] not in attached_routers:
                             #link non adiacente
                             #prendo il dr e trovo il nap annunciato
-                            if dr == lsa9_entry['ospf3IntraAreaPrefixLsa']['referencedAdvertisingRouter'] and link_state_id == lsa9_entry['ospf3IntraAreaPrefixLsa']['referencedLinkStateId']:
+                            if dr == l9_e['referencedAdvertisingRouter'] and link_state_id == l9_e['referencedLinkStateId']:
                                 #prendo prefix 
-                                network_prefix= lsa9_entry['ospf3IntraAreaPrefixLsa']['prefixList'][0]['prefix']
-                                link_id=lsa9_entry['ospf3IntraAreaPrefixLsa']['prefixList'][0]['prefix'] 
-                                prefix_l=lsa9_entry['ospf3IntraAreaPrefixLsa']['prefixList'][0]['prefixLength']
-                                metric=lsa9_entry['ospf3IntraAreaPrefixLsa']['prefixList'][0]['metric']
+                                network_prefix= l9_e['prefixList'][0]['prefix']
+                                link_id=l9_e['prefixList'][0]['prefix'] 
+                                prefix_l=l9_e['prefixList'][0]['prefixLength']
+                                metric=l9_e['prefixList'][0]['metric']
                                 new_link = Link(id=link_id, type="transitNetwork", options=None, metric=metric, endpoints=attached_routers ,prefix=f"{link_id}/{prefix_l}")
                                 new_link.set_dr_bdr(dr=dr,bdr=bdr)
                                 network_topology.find_target_area(area_data).add_link(new_link)
@@ -186,10 +188,11 @@ for area_data in iar_lsa_3:
         continue
     
     for lsa_entry in iar_lsa_3[area_data]['ospf3AreaLsaList']:
-            ip = lsa_entry['ospf3InterAreaPrefixLsa']['prefix']['prefix']
-            mask = lsa_entry['ospf3InterAreaPrefixLsa']['prefix']['prefixLength'] 
+            l3_e=lsa_entry['ospf3InterAreaPrefixLsa']
+            ip = l3_e['prefix']['prefix']
+            mask = l3_e['prefix']['prefixLength'] 
             via = lsa_entry['advertisingRouter']
-            metric = lsa_entry['ospf3InterAreaPrefixLsa']['metric'] 
+            metric = l3_e['metric'] 
 
             # se la route è già esistente, vuol dire che sto aggiungendo una
             # via per raggiungere la destinazione
@@ -213,9 +216,10 @@ for area_data in iar_lsa_4:
         continue
 
     for lsa_entry in iar_lsa_4[area_data]['ospf3AreaLsaList']:
-                asbr = lsa_entry['ospf3InterAreaRouterLsa']['destinationRouterId']
+                l4_e=lsa_entry['ospf3InterAreaRouterLsa']
+                asbr = l4_e['destinationRouterId']
                 via = lsa_entry['advertisingRouter']
-                metric = lsa_entry['ospf3InterAreaRouterLsa']['metric']
+                metric = l4_e['metric']
 
                 path = Path_To_ASBR(asbr, via, metric)
                 
@@ -226,11 +230,12 @@ for area_data in iar_lsa_4:
 external_lsa_5 = get_external_lsa_info(target_node)
 
 for lsa in external_lsa_5:
-        ip = lsa['ospf3ExternalLsa']['prefix']['prefix']
-        prefix_len = lsa['ospf3ExternalLsa']['prefix']['prefixLength']
+        l5_e=lsa['ospf3ExternalLsa']
+        ip = l5_e['prefix']['prefix']
+        prefix_len = l5_e['prefix']['prefixLength']
         via = lsa['advertisingRouter']
-        metric = lsa['ospf3ExternalLsa']['metric']
-        metric_type = lsa['ospf3ExternalLsa']['metricType']
+        metric = l5_e['metric']
+        metric_type = l5_e['metricType']
 
         route = Route(ip, prefix_len, via, metric, metric_type)
         
